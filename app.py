@@ -309,7 +309,7 @@ app.layout = html.Div(
                                                          # fixed_rows={'headers': True, 'data': 0},
                                                          style_as_list_view=True,
                                                          ))],
-                    className="pretty_container five columns",
+                    className="pretty_container six columns",
                 ),
                 html.Div(
                     [html.P("Cases by Cities : TO COME SOON...",
@@ -317,7 +317,7 @@ app.layout = html.Div(
                             style={'textAlign': 'center', 'fontSize': '1.8vh'}, ),
                      # dcc.Loading(dcc.Graph(id="maindd_graph"))
                      ],
-                    className="pretty_container seven columns",
+                    className="pretty_container six columns",
                 ),
             ],
             className="row flex-display",
