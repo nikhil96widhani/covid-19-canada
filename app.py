@@ -35,7 +35,6 @@ server.secret_key = os.environ.get('secret_key', str(randint(0, 1000000)))
 app = dash.Dash(
     __name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}]
 )
-server = app.server
 
 dfcases = functions.gendf('Cases')
 dfmortality = functions.gendf('Mortality')
