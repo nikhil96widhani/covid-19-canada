@@ -4,7 +4,7 @@ import pandas as pd
 from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
-# from functions import load_data
+from functions import load_data
 from functions import functions
 import os
 from datetime import datetime
@@ -15,15 +15,15 @@ import plotly.express as px
 
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("data").resolve()
-
+load_data.run_check()
 ########### Initiate the app
 app = dash.Dash(
     __name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}]
 )
 server = app.server
-app.title='Covid-19 Canada'
+app.title = 'Covid-19 Canada'
 #
-# load_data.run_check()
+
 
 dfcases = functions.gendf('Cases')
 dfmortality = functions.gendf('Mortality')
@@ -63,7 +63,7 @@ app.layout = html.Div(
                             [
                                 html.H2(
                                     "Canada Coronavirus Tracker",
-                                    style={'font-weight': 'bold', 'fontSize': '5vh', "margin-bottom": "0px"}
+                                    style={'font-weight': 'bold', 'fontSize': '4vh', "margin-bottom": "0px"}
                                 ),
                                 html.H5(
                                     "Last Updated at {} ".format(str(time)[:-10]),
@@ -95,7 +95,7 @@ app.layout = html.Div(
             [
                 html.Div(
                     [dcc.Loading(html.H6(id="well_text",
-                             style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+                                         style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
                                          )),
                      html.P("CONFIRMED",
                             style={'color': 'white'}
@@ -106,7 +106,7 @@ app.layout = html.Div(
                 ),
                 html.Div(
                     [dcc.Loading(html.H6(id="gasText",
-                             style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+                                         style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
                                          )),
                      html.P("RECOVERED",
                             style={'color': 'white'}
@@ -117,7 +117,7 @@ app.layout = html.Div(
                 ),
                 html.Div(
                     [dcc.Loading(html.H6(id="oilText",
-                             style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+                                         style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
                                          )),
                      html.P("TESTING",
                             style={'color': 'white'}
@@ -128,7 +128,7 @@ app.layout = html.Div(
                 ),
                 html.Div(
                     [dcc.Loading(html.H6(id="waterText",
-                             style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+                                         style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
                                          )),
                      html.P("DECEASED",
                             style={'color': 'white'}
@@ -343,7 +343,6 @@ def make_line_chart(val):
 
     dff3 = dfrecovered[['date_recovered', 'cumulative_recovered']].copy()
     dff3 = dff3.groupby('date_recovered', as_index=False).agg({'cumulative_recovered': 'sum'})
-    print(dff3.head(20))
 
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=dff1.date_report, y=dff1['total_cases'], name="Confirmed",
@@ -379,9 +378,10 @@ def make_pie_chart(val):
                  hover_data=['total'], labels={'total': 'total cases'})
     fig.update_traces(textposition='inside', textinfo='percent+label')
     fig.update_layout(margin={"r": 10, "t": 35, "l": 10, "b": 10},
-                      showlegend = False #bring leadgend side
+                      showlegend=False  # bring leadgend side
                       )
     return fig
+
 
 if __name__ == '__main__':
     app.run_server()
