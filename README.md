@@ -1,60 +1,17 @@
-# Dash Natural Gas Well Production
+# Deploying your Dash app online
 
-This is a demo of the Dash interactive Python framework developed by [Plotly](https://plot.ly/).
+1. Setup account on Heroku and download Heroku CLI utility
+2. Navigate to this folder
+3. Commit this folder to Git
+4. 'heroku login' and type in your credentials
+5. 'heroku create -n [YOUR-APP-NAME]' where YOUR-APP-NAME refers to the title of your Dash app
+6. 'heroku git:remote -a [YOUR-APP-GIT-URL]' where YOUR-APP-GIT-URL refers to the Git link returned by 5.
+7. 'git push heroku master' will deploy your app to Heroku
+8. 'heroku ps:scale web=1' will create a Dyno and make your app live
 
-Dash abstracts away all of the technologies and protocols required to build an interactive web-based application and is a simple and effective way to bind a user interface around your Python code. To learn more check out our [documentation](https://plot.ly/dash).
+If you want to make changes to your app repeat steps 2. 3. and 7.
 
-## Getting Started
+Delete the runtime.txt if you wish to run on Python 2.7.x instead of 3.6.x
 
-### Running the app locally
-
-First create a virtual environment with conda or venv inside a temp folder, then activate it.
-
-```
-virtualenv venv
-
-# Windows
-venv\Scripts\activate
-# Or Linux
-source venv/bin/activate
-
-```
-
-Clone the git repo, then install the requirements with pip
-
-```
-
-git clone https://github.com/plotly/dash-sample-apps
-cd dash-sample-apps/apps/dash-oil-and-gas
-pip install -r requirements.txt
-
-```
-
-Run the app
-
-```
-
-python app.py
-
-```
-
-## About the app
-
-This Dash app displays oil production in western New York. There are filters at the top of the app to update the graphs below. By selecting or hovering over data in one plot will update the other plots ('cross-filtering').
-
-## Built With
-
-- [Dash](https://dash.plot.ly/) - Main server and interactive components
-- [Plotly Python](https://plot.ly/python/) - Used to create the interactive plots
-
-## Screenshots
-
-The following are screenshots for the app in this repo:
-
-![animated1](screenshots/animated1.gif)
-
-![screenshot](screenshots/screenshot1.png)
-
-![screenshot](screenshots/screenshot2.png)
-
-![screenshot](screenshots/screenshot3.png)
+Do NOT rename or delete any other file in this folder (except this README) or else your
+app will not setup properly.
