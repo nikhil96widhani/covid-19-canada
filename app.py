@@ -30,6 +30,10 @@ dfmortality = functions.gendf('Mortality')
 dfrecovered = functions.gendf('Recovered')
 dftesting = functions.gendf('Testing')
 
+dropdown_cities_confirmed = dfcases['health_region'].unique()
+dropdown_cities_recovered = dfrecovered['province'].unique()
+dropdown_cities_mortality = dfmortality['health_region'].unique()
+
 file = "./data/data (1).xlsx"
 time = datetime.fromtimestamp(os.path.getctime(file))
 
@@ -312,11 +316,56 @@ app.layout = html.Div(
                     className="pretty_container six columns",
                 ),
                 html.Div(
-                    [html.P("Cases by Cities : TO COME SOON...",
-                            className="control_label",
-                            style={'textAlign': 'center', 'fontSize': '1.8vh'}, ),
-                     # dcc.Loading(dcc.Graph(id="maindd_graph"))
-                     ],
+                    [
+                        html.P("Case Count by City (type/select a city)",
+                               className="control_label",
+                               style={'textAlign': 'center', 'fontSize': '1.8vh'}),
+                        html.Div(
+                            [dcc.Dropdown(
+                                id='city_dropdown_confirmed',
+                                options=[{'label': i, 'value': i} for i in dropdown_cities_confirmed],
+                                value='Ottawa',
+                                className="dcc_controls",
+                                placeholder='All Departments'
+                            ),
+                                dcc.Loading(html.P(id='confirmed_city_text',
+                                                   style={'color': 'white', 'fontSize': '2vh'}
+                                                   ))],
+                            id="welldss",
+                            className="mini_container",
+                            style={'backgroundColor': '#0099e5'}
+                        ),
+                        html.Div(
+                            [dcc.Dropdown(
+                                id='city_dropdown_recovered',
+                                options=[{'label': i, 'value': i} for i in dropdown_cities_recovered],
+                                value='Ontario',
+                                className="dcc_controls",
+                                placeholder='All Departments'
+                            ),
+                                dcc.Loading(html.P(id='recovered_city_text',
+                                                   style={'color': 'white', 'fontSize': '2vh'}
+                                                   ))],
+                            id="gadss",
+                            className="mini_container",
+                            style={'backgroundColor': '#6cc644'}
+                        ),
+                        html.Div(
+                            [dcc.Dropdown(
+                                id='city_dropdown_mortality',
+                                options=[{'label': i, 'value': i} for i in dropdown_cities_mortality],
+                                value='Ottawa',
+                                className="dcc_controls",
+                                placeholder='All Departments'
+                            ),
+                                dcc.Loading(html.P(id='mortality_city_text',
+                                                   style={'color': 'white', 'fontSize': '2vh'}
+                                                   ))],
+                            id="welldsds",
+                            className="mini_container",
+                            style={'backgroundColor': 'rgb(255,27,14)'}
+                        ),
+                    ],
                     className="pretty_container six columns",
                 ),
             ],
@@ -468,6 +517,56 @@ def make_count_figure(val):
     data = dff2.to_dict('rows')
 
     return data
+
+
+@app.callback(
+    Output("confirmed_city_text", "children"),
+    [Input("city_dropdown_confirmed", "value")],
+)
+def confirmed_city(value):
+    dff = dfcases[['health_region']]
+    dff = dff.groupby('health_region').health_region.agg('count').to_frame('total_cases').reset_index()
+    dff = dff[dff['health_region'].str.contains(value)].reset_index()
+    if len(dff) > 0:
+        count = dff.iloc[0]['total_cases']
+    else:
+        count = 'No Data for'
+
+    return '{} CONFIRMED cases in {}'.format(count, value)
+
+
+@app.callback(
+    Output("recovered_city_text", "children"),
+    [Input("city_dropdown_recovered", "value")],
+)
+def recovered_city(value):
+    dff = dfrecovered[['date_recovered', 'province', 'cumulative_recovered']]
+    dff = dff.fillna(0)
+    dff = dff.sort_values(by='date_recovered', ascending=False)
+    dff = dff.drop_duplicates(subset='province', keep='first', inplace=False)
+    dff = dff[dff['province'].str.contains(value)].reset_index()
+    if len(dff) > 0:
+        count = dff.iloc[0]['cumulative_recovered']
+    else:
+        count = 'No Data for'
+
+    return '{} Recovered cases in {}'.format(count, value)
+
+
+@app.callback(
+    Output("mortality_city_text", "children"),
+    [Input("city_dropdown_mortality", "value")],
+)
+def mortality_city(value):
+    dff = dfmortality[['health_region']]
+    dff = dff.groupby('health_region').health_region.agg('count').to_frame('total_cases').reset_index()
+    dff = dff[dff['health_region'].str.contains(value)].reset_index()
+    if len(dff) > 0:
+        count = dff.iloc[0]['total_cases']
+    else:
+        count = 'No Data for'
+
+    return '{} Deaths in {}'.format(count, value)
 
 
 if __name__ == '__main__':
