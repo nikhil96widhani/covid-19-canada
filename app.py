@@ -229,7 +229,7 @@ app.layout = html.Div(
                             [dcc.Loading(dcc.Graph(id="count_graph"))],
                             id="countGraphContainer",
                             className="pretty_container",
-                            # style={'height': '600px'}
+                            # style={'width': '100%'}
                         ),
                     ],
                     id="right-column",
@@ -419,7 +419,7 @@ def make_line_chart(val):
     fig.add_trace(go.Scatter(x=dff3.date_recovered, y=dff3['cumulative_recovered'], name="Recovered",
                              line_color='green'))
 
-    fig.update_layout(xaxis_rangeslider_visible=True)
+    # fig.update_layout(xaxis_rangeslider_visible=True)
     fig.update_layout(margin={"r": 10, "t": 35, "l": 10, "b": 10})
     fig.update_layout(
         # width=450,
