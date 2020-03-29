@@ -21,7 +21,7 @@ app = dash.Dash(
     __name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}]
 )
 server = app.server
-app.title='Covid-19'
+app.title='Covid-19 Canada'
 #
 # load_data.run_check()
 
@@ -94,9 +94,9 @@ app.layout = html.Div(
         html.Div(
             [
                 html.Div(
-                    [html.H6(id="well_text",
+                    [dcc.Loading(html.H6(id="well_text",
                              style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
-                             ),
+                                         )),
                      html.P("CONFIRMED",
                             style={'color': 'white'}
                             )],
@@ -105,9 +105,9 @@ app.layout = html.Div(
                     style={'backgroundColor': '#0099e5'}
                 ),
                 html.Div(
-                    [html.H6(id="gasText",
+                    [dcc.Loading(html.H6(id="gasText",
                              style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
-                             ),
+                                         )),
                      html.P("RECOVERED",
                             style={'color': 'white'}
                             )],
@@ -116,9 +116,9 @@ app.layout = html.Div(
                     style={'backgroundColor': '#6cc644'}
                 ),
                 html.Div(
-                    [html.H6(id="oilText",
+                    [dcc.Loading(html.H6(id="oilText",
                              style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
-                             ),
+                                         )),
                      html.P("TESTING",
                             style={'color': 'white'}
                             )],
@@ -127,9 +127,9 @@ app.layout = html.Div(
                     style={'backgroundColor': '#fbbc05'}
                 ),
                 html.Div(
-                    [html.H6(id="waterText",
+                    [dcc.Loading(html.H6(id="waterText",
                              style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
-                             ),
+                                         )),
                      html.P("DECEASED",
                             style={'color': 'white'}
                             )],
@@ -343,14 +343,17 @@ def make_line_chart(val):
 
     dff3 = dfrecovered[['date_recovered', 'cumulative_recovered']].copy()
     dff3 = dff3.groupby('date_recovered', as_index=False).agg({'cumulative_recovered': 'sum'})
+    print(dff3.head(20))
 
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=dff1.date_report, y=dff1['total_cases'], name="Confirmed",
                              line_color='deepskyblue'))
-    fig.add_trace(go.Scatter(x=dff3.date_recovered, y=dff3['cumulative_recovered'], name="Recovered",
-                             line_color='green'))
+
     fig.add_trace(go.Scatter(x=dff2.date_death_report, y=dff2['total_mortality'], name="mortality",
                              line_color='tomato'))
+
+    fig.add_trace(go.Scatter(x=dff3.date_recovered, y=dff3['cumulative_recovered'], name="Recovered",
+                             line_color='green'))
 
     fig.update_layout(xaxis_rangeslider_visible=True)
     fig.update_layout(margin={"r": 10, "t": 35, "l": 10, "b": 10})
@@ -372,10 +375,12 @@ def make_pie_chart(val):
     dff = dff.rename(columns={0: 'reason'})
     dff = dff.groupby('reason').reason.agg('count').to_frame('total').reset_index()
 
-    fig = px.pie(dff, values='total', names='reason')
-    fig.update_traces(textposition='inside')
-    fig.update_layout(uniformtext_minsize=12, uniformtext_mode='hide')
-    fig.update_layout(margin={"r": 10, "t": 35, "l": 10, "b": 10})
+    fig = px.pie(dff, values='total', names='reason',
+                 hover_data=['total'], labels={'total': 'total cases'})
+    fig.update_traces(textposition='inside', textinfo='percent+label')
+    fig.update_layout(margin={"r": 10, "t": 35, "l": 10, "b": 10},
+                      showlegend = False #bring leadgend side
+                      )
     return fig
 
 if __name__ == '__main__':
