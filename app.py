@@ -15,7 +15,7 @@ import plotly.express as px
 
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("data").resolve()
-load_data.run_check()
+# load_data.run_check()
 ########### Initiate the app
 app = dash.Dash(
     __name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}]
@@ -98,7 +98,7 @@ app.layout = html.Div(
                                          style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
                                          )),
                      html.P("CONFIRMED",
-                            style={'color': 'white'}
+                            style={'color': 'white', 'fontSize': '2vh'}
                             )],
                     id="wells",
                     className="mini_container",
@@ -109,7 +109,7 @@ app.layout = html.Div(
                                          style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
                                          )),
                      html.P("RECOVERED",
-                            style={'color': 'white'}
+                            style={'color': 'white', 'fontSize': '2vh'}
                             )],
                     id="gas",
                     className="mini_container",
@@ -120,7 +120,7 @@ app.layout = html.Div(
                                          style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
                                          )),
                      html.P("TESTING",
-                            style={'color': 'white'}
+                            style={'color': 'white', 'fontSize': '2vh'}
                             )],
                     id="oil",
                     className="mini_container",
@@ -131,7 +131,7 @@ app.layout = html.Div(
                                          style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
                                          )),
                      html.P("DECEASED",
-                            style={'color': 'white'}
+                            style={'color': 'white', 'fontSize': '2vh'}
                             )],
                     id="water",
                     className="mini_container",
@@ -145,7 +145,7 @@ app.layout = html.Div(
                 html.Div(
                     [
                         dcc.Loading(dash_table.DataTable(id='reg_table',
-                                                         columns=[{'name': 'City', 'id': 'province'},
+                                                         columns=[{'name': 'Province', 'id': 'province'},
                                                                   {'name': 'Confirmed', 'id': 'total_cases'},
                                                                   {'name': 'Recovered', 'id': 'total_recovered'},
                                                                   {'name': 'Deceased', 'id': 'total_mortality'}],
@@ -158,7 +158,7 @@ app.layout = html.Div(
                                                              'maxWidth': 0,
                                                          },
                                                          style_table={
-                                                             'maxHeight': '450px',
+                                                             'maxHeight': '500px',
                                                              'overflowY': 'scroll',
                                                              'border': 'thin lightgrey solid'
                                                          },
@@ -241,18 +241,83 @@ app.layout = html.Div(
         html.Div(
             [
                 html.Div(
-                    [html.H6("New reports by time with range slider",
-                             className="control_label",
-                             style={'textAlign': 'center'}),
+                    [html.P("New reports by time with range slider",
+                            className="control_label",
+                            style={'textAlign': 'center', 'fontSize': '1.8vh'}, ),
                      dcc.Loading(dcc.Graph(id="main_graph"))],
                     className="pretty_container seven columns",
                 ),
                 html.Div(
-                    [html.H6("Reason of Transmission (Travel to / Reason)",
-                             className="control_label",
-                             style={'textAlign': 'center'}),
+                    [html.P("Top 15 Reason of Transmission (Travel to/Reason)",
+                            className="control_label",
+                            style={'textAlign': 'center', 'fontSize': '1.8vh'}),
                      dcc.Loading(dcc.Graph(id="individual_graph"))],
                     className="pretty_container five columns",
+                ),
+            ],
+            className="row flex-display",
+        ),
+        html.Div(
+            [
+                html.Div(
+                    [
+                        # html.P("Top 15 Reason of Transmission (Travel to/Reason)",
+                        #        className="control_label",
+                        #        style={'textAlign': 'center', 'fontSize': '1.8vh'}),
+                        dcc.Loading(dash_table.DataTable(id='news_table',
+                                                         columns=[{'name': 'NEWS: Latest Confirmed Case details',
+                                                                   'id': 'text'}],
+                                                         style_cell={
+                                                             'textAlign': 'left',
+                                                             'fontSize': 16,
+                                                             'font-family': 'sans-serif',
+                                                             'overflow': 'hidden',
+                                                             'textOverflow': 'ellipsis',
+                                                             'maxWidth': 0,
+                                                         },
+                                                         style_table={
+                                                             'maxHeight': '500px',
+                                                             'overflowY': 'scroll',
+                                                             'border': 'thin lightgrey solid'
+                                                         },
+                                                         style_data={
+                                                             'whiteSpace': 'normal',
+                                                             'height': 'auto'
+                                                         },
+                                                         style_cell_conditional=[
+                                                             {
+                                                                 'if': {'column_id': 'text'},
+                                                                 'padding-left': '10px'
+                                                             },
+                                                         ],
+                                                         style_data_conditional=[
+                                                             {
+                                                                 'if': {'row_index': 'odd'},
+                                                                 'backgroundColor': '#d7f2ff'
+                                                             },
+                                                             {
+                                                                 'if': {'column_id': 'total_cases'},
+                                                                 'backgroundColor': '#d7f2ff',
+                                                                 'color': 'black',
+                                                             },
+                                                         ],
+                                                         style_header={
+                                                             'backgroundColor': '#d7f2ff',
+                                                             'fontWeight': 'bold',
+                                                             'textAlign': 'center',
+                                                         },
+                                                         # fixed_rows={'headers': True, 'data': 0},
+                                                         style_as_list_view=True,
+                                                         ))],
+                    className="pretty_container five columns",
+                ),
+                html.Div(
+                    [html.P("Cases by Cities : TO COME SOON...",
+                            className="control_label",
+                            style={'textAlign': 'center', 'fontSize': '1.8vh'}, ),
+                     # dcc.Loading(dcc.Graph(id="maindd_graph"))
+                     ],
+                    className="pretty_container seven columns",
                 ),
             ],
             className="row flex-display",
@@ -373,6 +438,8 @@ def make_pie_chart(val):
     dff = dff['reason'].str.split(',', expand=True).stack().reset_index(level=1, drop=True).to_frame()
     dff = dff.rename(columns={0: 'reason'})
     dff = dff.groupby('reason').reason.agg('count').to_frame('total').reset_index()
+    dff = dff.sort_values(by='total', ascending=False)
+    dff = dff.head(15)
 
     fig = px.pie(dff, values='total', names='reason',
                  hover_data=['total'], labels={'total': 'total cases'})
@@ -381,6 +448,26 @@ def make_pie_chart(val):
                       showlegend=False  # bring leadgend side
                       )
     return fig
+
+
+@app.callback(
+    Output("news_table", "data"),
+    [Input("storage", "data")],
+)
+def make_count_figure(val):
+    dff = dfcases[
+        ['case_id', 'age', 'sex', 'health_region', 'date_report', 'travel_history_country', 'locally_acquired']]
+    dff = dff.sort_values(by=['case_id'], ascending=False)
+    dff = dff.dropna(subset=['age', 'sex', 'health_region'], how='all')
+    dff['reason'] = dff['travel_history_country'].combine_first(dff['locally_acquired'])
+    dff['reason'] = dff['reason'].fillna("Unknown")
+    dff['text'] = 'A person of ' + dff['sex'].astype(str) + ' gender' + ' who was in their ' \
+                  + dff['age'].astype(str) + ' age group ' + ' from ' + dff['health_region'].astype(str) + \
+                  ' acquired virus from travel to/reason of : ' + dff['reason'].astype(str)
+    dff2 = dff.head(100)
+    data = dff2.to_dict('rows')
+
+    return data
 
 
 if __name__ == '__main__':
