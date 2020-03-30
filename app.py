@@ -469,7 +469,7 @@ def make_line_chart(val):
                              line_color='green'))
 
     # fig.update_layout(xaxis_rangeslider_visible=True)
-    fig.update_layout(margin={"r": 10, "t": 35, "l": 10, "b": 10})
+    fig.update_layout(margin={"r": 10, "t": 80, "l": 10, "b": 10})
     fig.update_layout(
         # width=450,
         # height=450,
