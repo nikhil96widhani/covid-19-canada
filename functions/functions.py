@@ -35,7 +35,7 @@ def gen_plot(dffff):
                 {'province': 'Nova Scotia', 'lat': 45.000000, 'lon': -63.000000},
                 {'province': 'Ontario', 'lat': 50.000000, 'lon': -85.000000},
                 {'province': 'PEI', 'lat': 46.250000, 'lon': -63.000000},
-                {'province': 'Ouebec', 'lat': 53.000000, 'lon': -70.000000},
+                {'province': 'Quebec', 'lat': 53.000000, 'lon': -70.000000},
                 {'province': 'Repatriated', 'lat': 0, 'lon': 0},
                 {'province': 'Saskatchewan', 'lat': 55.000000, 'lon': -106.000000},
                 {'province': 'Yukon', 'lat': 64.2823, 'lon': -135.0000}, ]
@@ -54,7 +54,7 @@ def gen_plot(dffff):
 
     colour_scale = ['rgb(255,213,210)', 'rgb(255,194,191)', 'rgb(255,176,171)', 'rgb(255,157,151)', 'rgb(255,139,132)',
                     'rgb(255,120,112)', 'rgb(255,102,93)', 'rgb(255,83,73)', 'rgb(255,64,53)', 'rgb(255,46,34)',
-                    'rgb(255,27,14)']
+                    'rgb(255,27,14)', 'rgb(218,12,0)']
 
     df = df.sort_values('total_cases', ascending=True)
     df.index = np.arange(1, len(df) + 1)
