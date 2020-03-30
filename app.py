@@ -245,7 +245,7 @@ app.layout = html.Div(
         html.Div(
             [
                 html.Div(
-                    [html.P("New reports by time with range slider",
+                    [html.P("New cases by time",
                             className="control_label",
                             style={'textAlign': 'center', 'fontSize': '1.8vh'}, ),
                      dcc.Loading(dcc.Graph(id="main_graph"))],
