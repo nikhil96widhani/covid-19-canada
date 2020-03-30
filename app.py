@@ -120,17 +120,6 @@ app.layout = html.Div(
                     style={'backgroundColor': '#6cc644'}
                 ),
                 html.Div(
-                    [dcc.Loading(html.H6(id="oilText",
-                                         style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
-                                         )),
-                     html.P("TESTING",
-                            style={'color': 'white', 'fontSize': '2vh'}
-                            )],
-                    id="oil",
-                    className="mini_container",
-                    style={'backgroundColor': '#fbbc05'}
-                ),
-                html.Div(
                     [dcc.Loading(html.H6(id="waterText",
                                          style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
                                          )),
@@ -140,6 +129,17 @@ app.layout = html.Div(
                     id="water",
                     className="mini_container",
                     style={'backgroundColor': 'rgb(255,27,14)'}
+                ),
+                html.Div(
+                    [dcc.Loading(html.H6(id="oilText",
+                                         style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+                                         )),
+                     html.P("TESTED",
+                            style={'color': 'white', 'fontSize': '2vh'}
+                            )],
+                    id="oil",
+                    className="mini_container",
+                    style={'backgroundColor': '#fbbc05'}
                 ),
             ],
             className="row flex-display",
@@ -329,7 +329,7 @@ app.layout = html.Div(
                                 placeholder='All Departments'
                             ),
                                 dcc.Loading(html.P(id='confirmed_city_text',
-                                                   style={'color': 'white', 'fontSize': '2vh'}
+                                                   style={'color': 'white', 'fontSize': '2vh', 'padding-top': '15px'}
                                                    ))],
                             id="welldss",
                             className="mini_container",
@@ -344,7 +344,7 @@ app.layout = html.Div(
                                 placeholder='All Departments'
                             ),
                                 dcc.Loading(html.P(id='recovered_city_text',
-                                                   style={'color': 'white', 'fontSize': '2vh'}
+                                                   style={'color': 'white', 'fontSize': '2vh', 'padding-top': '15px'}
                                                    ))],
                             id="gadss",
                             className="mini_container",
@@ -359,7 +359,7 @@ app.layout = html.Div(
                                 placeholder='All Departments'
                             ),
                                 dcc.Loading(html.P(id='mortality_city_text',
-                                                   style={'color': 'white', 'fontSize': '2vh'}
+                                                   style={'color': 'white', 'fontSize': '2vh', 'padding-top': '15px'}
                                                    ))],
                             id="welldsds",
                             className="mini_container",
@@ -551,7 +551,7 @@ def recovered_city(value):
     else:
         count = 'No Data for'
 
-    return '{} Recovered cases in {}'.format(count, value)
+    return '{} RECOVERED cases in {}'.format(count, value)
 
 
 @app.callback(
@@ -567,7 +567,7 @@ def mortality_city(value):
     else:
         count = 'No Data for'
 
-    return '{} Deaths in {}'.format(count, value)
+    return '{} DEATHS in {}'.format(count, value)
 
 
 if __name__ == '__main__':
