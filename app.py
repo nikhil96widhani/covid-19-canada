@@ -486,6 +486,7 @@ def make_pie_chart(val):
     dff['reason'] = dfcases['travel_history_country'].combine_first(dfcases['locally_acquired'])
     dff = dff['reason'].str.split(',', expand=True).stack().reset_index(level=1, drop=True).to_frame()
     dff = dff.rename(columns={0: 'reason'})
+    dff['reason'] = dff['reason'].replace({'Close contact': 'Close Contact'})
     dff = dff.groupby('reason').reason.agg('count').to_frame('total').reset_index()
     dff = dff.sort_values(by='total', ascending=False)
     dff = dff.head(15)
