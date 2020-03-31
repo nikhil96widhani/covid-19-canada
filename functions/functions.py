@@ -12,12 +12,16 @@ def gendf(sheet):
 
 
 def sumdf(dff, dt_col, sum_col):
-    dff[dt_col] = pd.to_datetime(dff[dt_col])
-    dff = dff.sort_values(by=dt_col, ascending=False)
-    dff = dff.drop_duplicates(subset=['province'], keep='first')
+    try:
+        dff[sum_col] = dff[sum_col].replace('\*', '', regex=True).astype(float)
+        dff[dt_col] = pd.to_datetime(dff[dt_col])
+        dff = dff.sort_values(by=dt_col, ascending=False)
+        dff = dff.drop_duplicates(subset=['province'], keep='first')
+        dff = dff[dff[sum_col].notna()]
+        total = dff[sum_col].sum()
+    except:
+        total=000000
 
-    dff = dff[dff[sum_col].notna()]
-    total = dff[sum_col].sum()
     return total
 
 
@@ -132,3 +136,7 @@ def comma(num):
         return '{:,.2f}'.format(num)  # Rounds to 2 decimal places
     else:
         return num
+
+
+def get_percentage(total, number):
+    return '{0:.2f}%'.format((int(number) / int(total) * 100))

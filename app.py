@@ -12,6 +12,8 @@ import dash_table
 import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
+import urllib.request, json
+
 
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("data").resolve()
@@ -375,20 +377,37 @@ app.layout = html.Div(
     id="mainContainer",
     style={"display": "flex", "flex-direction": "column"},
 )
-
-
-# Selectors -> well text
-@app.callback(
-    Output("well_text", "children"),
-    [Input("storage", "data")],
-)
-def update_well_text(data):
-    total_cases = functions.comma(len(dfcases))
-    return total_cases
+#
+# # Selectors -> well text
+# @app.callback(
+#     Output("well_text", "children"),
+#     [Input("storage", "data")],
+# )
+# def update_well_text(data):
+#     total_cases = functions.comma(len(dfcases))
+#     return total_cases
+#
+#
+# @app.callback(
+#     [
+#         Output("gasText", "children"),
+#         Output("oilText", "children"),
+#         Output("waterText", "children"),
+#     ],
+#     [Input("storage", "data")],
+# )
+# def update_text(data):
+#     total_recovered = functions.sumdf(dfrecovered, 'date_recovered', 'cumulative_recovered')
+#     total_recovered = functions.comma(total_recovered)
+#     total_testing = functions.sumdf(dftesting, 'date_testing', 'cumulative_testing')
+#     total_testing = functions.comma(total_testing)
+#
+#     return total_recovered, total_testing, len(dfmortality)
 
 
 @app.callback(
     [
+        Output("well_text", "children"),
         Output("gasText", "children"),
         Output("oilText", "children"),
         Output("waterText", "children"),
@@ -396,12 +415,29 @@ def update_well_text(data):
     [Input("storage", "data")],
 )
 def update_text(data):
-    total_recovered = functions.sumdf(dfrecovered, 'date_recovered', 'cumulative_recovered')
-    total_recovered = functions.comma(total_recovered)
-    total_testing = functions.sumdf(dftesting, 'date_testing', 'cumulative_testing')
-    total_testing = functions.comma(total_testing)
+    url_updates = 'https://opendata.arcgis.com/datasets/bbb2e4f589ba40d692fab712ae37b9ac_2.geojson'
+    with urllib.request.urlopen(url_updates) as url:
+        data = json.loads(url.read().decode())
 
-    return total_recovered, total_testing, len(dfmortality)
+    for k, v in data.items():
+        v = v
+        for i in v:
+            if 'Canada' in str(i):
+                dict_can = i
+                break
+            else:
+                continue
+
+    confirmed = dict_can.get('properties').get('Confirmed')
+    deaths = dict_can.get('properties').get('Deaths')
+    recovered = dict_can.get('properties').get('Recovered')
+
+    total_testing = functions.sumdf(dftesting, 'date_testing', 'cumulative_testing')
+    total_testing = functions.comma(int(total_testing))
+
+    mortality_text = '{} ({})'.format(functions.comma(deaths), functions.get_percentage(confirmed, deaths))
+    recovered_text = '{} ({})'.format(functions.comma(recovered), functions.get_percentage(confirmed, recovered))
+    return functions.comma(confirmed), recovered_text, total_testing, mortality_text
 
 
 # Selectors -> count graph
@@ -455,8 +491,15 @@ def make_line_chart(val):
     dff2 = dfmortality[['date_death_report']].copy()
     dff2 = dff2.groupby('date_death_report').date_death_report.agg('count').to_frame('total_mortality').reset_index()
 
-    dff3 = dfrecovered[['date_recovered', 'cumulative_recovered']].copy()
+    dff3 = dfrecovered[['date_recovered', 'cumulative_recovered', 'province']].copy()
+    dff3['date_recovered'] = pd.to_datetime(dff3['date_recovered'])
+    dff3 = dff3.sort_values(by='date_recovered', ascending=False)
+    dff3['cumulative_recovered'] = dff3['cumulative_recovered'].fillna(0)
     dff3 = dff3.groupby('date_recovered', as_index=False).agg({'cumulative_recovered': 'sum'})
+    dff3['cumulative_recovered2'] = dff3['cumulative_recovered']
+    dff3.cumulative_recovered2 = dff3.cumulative_recovered2.shift(1)
+    dff3['cumulative_recovered2'] = dff3['cumulative_recovered2'].fillna(0)
+    dff3['cumulative_recovered'] = dff3['cumulative_recovered'] - dff3['cumulative_recovered2']
 
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=dff1.date_report, y=dff1['total_cases'], name="Confirmed",
