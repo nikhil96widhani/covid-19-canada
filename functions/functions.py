@@ -1,6 +1,7 @@
 import pandas as pd
 import plotly.graph_objects as go
 import numpy as np
+import passwords
 
 
 def gendf(sheet):
@@ -50,7 +51,7 @@ def gen_plot(dffff):
     df = df.dropna()
     df = df[~df.province.str.contains("Repatriated")]
 
-    mapbox_access_token = 'pk.eyJ1IjoibmlraGlsOTZ3aWRoYW5pIiwiYSI6ImNrM3p4aW5nMjBhdGMzZXMxdjhndWYyczMifQ.zOzJZkhUYpyZQRfb1XNlmQ'
+    mapbox_access_token = passwords.passwords.get("mapbox_access_token")
 
     df['total_cases_str'] = df['total_cases'].astype(str)
     df['text'] = df['province'] + '<br>' + \
