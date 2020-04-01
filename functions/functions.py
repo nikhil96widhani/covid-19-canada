@@ -51,10 +51,10 @@ def gen_plot(dffff):
     df = df.dropna()
     df = df[~df.province.str.contains("Repatriated")]
 
-    try:
-        mapbox_access_token = passwords.passwords.get("mapbox_access_token")
-    except:
-        mapbox_access_token = "pk.eyJ1IjoibmlraGlsOTZ3aWRoYW5pIiwiYSI6ImNrM3p4aW5nMjBhdGMzZXMxdjhndWYyczMifQ.zOzJZkhUYpyZQRfb1XNlmQ"
+    # try:
+    #     mapbox_access_token = passwords.passwords.get("mapbox_access_token")
+    # except:
+    mapbox_access_token = "pk.eyJ1IjoibmlraGlsOTZ3aWRoYW5pIiwiYSI6ImNrM3p4aW5nMjBhdGMzZXMxdjhndWYyczMifQ.zOzJZkhUYpyZQRfb1XNlmQ"
 
     df['total_cases_str'] = df['total_cases'].astype(str)
     df['text'] = df['province'] + '<br>' + \
