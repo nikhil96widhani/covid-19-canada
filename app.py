@@ -125,7 +125,7 @@ app.layout = html.Div(
                     [dcc.Loading(html.H6(id="waterText",
                                          style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
                                          )),
-                     html.P("DECEASED",
+                     html.P("DECEASEDssss",
                             style={'color': 'white', 'fontSize': '2vh'}
                             )],
                     id="water",
