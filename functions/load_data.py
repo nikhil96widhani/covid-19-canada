@@ -1,7 +1,6 @@
 import ssl
 import threading
 import wget
-
 ssl._create_default_https_context = ssl._create_unverified_context
 
 def run_check():

@@ -138,5 +138,5 @@ def comma(num):
         return num
 
 
-def get_percentage(total, number):
-    return '{0:.2f}%'.format((int(number) / int(total) * 100))
+def get_percentage(a, b):
+    return '{0:.2f}%'.format((int(a) / int(a+b) * 100))
