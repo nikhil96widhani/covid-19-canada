@@ -107,7 +107,7 @@ app.layout = html.Div(
                      html.P("CONFIRMED",
                             style={'color': 'white', 'fontSize': '2vh'}
                             )],
-                    className="mini_container one-fourth column",
+                    className="pretty_container one-fourth column",
                     style={'backgroundColor': '#0099e5'}
                 ),
 
@@ -118,7 +118,7 @@ app.layout = html.Div(
                      html.P("RECOVERED",
                             style={'color': 'white', 'fontSize': '2vh'}
                             )],
-                    className="mini_container one-fourth column",
+                    className="pretty_container one-fourth column",
                     style={'backgroundColor': '#6cc644'}
                 ),
                 html.Div(
@@ -128,7 +128,7 @@ app.layout = html.Div(
                      html.P("DECEASED",
                             style={'color': 'white', 'fontSize': '2vh'}
                             )],
-                    className="mini_container one-fourth column",
+                    className="pretty_container one-fourth column",
                     style={'backgroundColor': 'rgb(255,27,14)'}
                 ),
                 html.Div(
@@ -138,7 +138,7 @@ app.layout = html.Div(
                      html.P("TESTED",
                             style={'color': 'white', 'fontSize': '2vh'}
                             )],
-                    className="mini_container one-fourth column",
+                    className="pretty_container one-fourth column",
                     style={'backgroundColor': '#fbbc05'}
                 ),
             ],
@@ -306,7 +306,7 @@ app.layout = html.Div(
         html.Div(
             [
                 html.Div(
-                    [html.P("New cases by time",
+                    [html.P("Daily new cases by time",
                             className="control_label",
                             style={'textAlign': 'center', 'fontSize': '1.8vh'}, ),
                      dcc.Loading(dcc.Graph(id="main_graph"))],
