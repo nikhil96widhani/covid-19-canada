@@ -107,10 +107,10 @@ app.layout = html.Div(
                      html.P("CONFIRMED",
                             style={'color': 'white', 'fontSize': '2vh'}
                             )],
-                    id="wells",
-                    className="mini_container",
+                    className="mini_container one-fourth column",
                     style={'backgroundColor': '#0099e5'}
                 ),
+
                 html.Div(
                     [dcc.Loading(html.H6(id="gasText",
                                          style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
@@ -118,8 +118,7 @@ app.layout = html.Div(
                      html.P("RECOVERED",
                             style={'color': 'white', 'fontSize': '2vh'}
                             )],
-                    id="gas",
-                    className="mini_container",
+                    className="mini_container one-fourth column",
                     style={'backgroundColor': '#6cc644'}
                 ),
                 html.Div(
@@ -129,8 +128,7 @@ app.layout = html.Div(
                      html.P("DECEASED",
                             style={'color': 'white', 'fontSize': '2vh'}
                             )],
-                    id="water",
-                    className="mini_container",
+                    className="mini_container one-fourth column",
                     style={'backgroundColor': 'rgb(255,27,14)'}
                 ),
                 html.Div(
@@ -140,13 +138,61 @@ app.layout = html.Div(
                      html.P("TESTED",
                             style={'color': 'white', 'fontSize': '2vh'}
                             )],
-                    id="oil",
-                    className="mini_container",
+                    className="mini_container one-fourth column",
                     style={'backgroundColor': '#fbbc05'}
                 ),
             ],
             className="row flex-display",
         ),
+        # html.Div(
+        #     [
+        #         html.Div(
+        #             [dcc.Loading(html.H6(id="well_text",
+        #                                  style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+        #                                  )),
+        #              html.P("CONFIRMED",
+        #                     style={'color': 'white', 'fontSize': '2vh'}
+        #                     )],
+        #             id="wells",
+        #             className="mini_container",
+        #             style={'backgroundColor': '#0099e5'}
+        #         ),
+        #         html.Div(
+        #             [dcc.Loading(html.H6(id="gasText",
+        #                                  style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+        #                                  )),
+        #              html.P("RECOVERED",
+        #                     style={'color': 'white', 'fontSize': '2vh'}
+        #                     )],
+        #             id="gas",
+        #             className="mini_container",
+        #             style={'backgroundColor': '#6cc644'}
+        #         ),
+        #         html.Div(
+        #             [dcc.Loading(html.H6(id="waterText",
+        #                                  style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+        #                                  )),
+        #              html.P("DECEASED",
+        #                     style={'color': 'white', 'fontSize': '2vh'}
+        #                     )],
+        #             id="water",
+        #             className="mini_container",
+        #             style={'backgroundColor': 'rgb(255,27,14)'}
+        #         ),
+        #         html.Div(
+        #             [dcc.Loading(html.H6(id="oilText",
+        #                                  style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+        #                                  )),
+        #              html.P("TESTED",
+        #                     style={'color': 'white', 'fontSize': '2vh'}
+        #                     )],
+        #             id="oil",
+        #             className="mini_container",
+        #             style={'backgroundColor': '#fbbc05'}
+        #         ),
+        #     ],
+        #     className="row flex-display",
+        # ),
         html.Div(
             [
                 html.Div(
@@ -223,7 +269,7 @@ app.layout = html.Div(
                                                          style_as_list_view=True,
                                                          )),
                         html.P(
-                            "Filtered by most Confirmed cases first",
+                            "*Filtered by most Confirmed cases first",
                             className="control_label",
                         ),
                     ],
@@ -241,18 +287,18 @@ app.layout = html.Div(
                             value=0,
                             inputStyle={"margin-right": "10px"},
                             labelStyle={'display': 'inline-block', "margin-right": "20px"},
-                            style={'textAlign': 'center', 'padding-top': '5px'},
+                            style={'textAlign': 'center', 'padding-bottom': '5px'},
                             # className="pretty_container",
                         ),
                         html.Div(
                             html.Div(id='count_graph'),
                             id="countGraphContainer",
-                            className="pretty_container",
+                            # className="pretty_container",
                             # style={'width': '100%'}
                         ),
                     ],
                     id="right-column",
-                    className="eight columns",
+                    className="pretty_container eight columns",
                 ),
             ],
             className="row flex-display",
