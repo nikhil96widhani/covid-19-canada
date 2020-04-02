@@ -13,6 +13,7 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 import urllib.request, json
+import base64
 
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("data").resolve()
@@ -24,7 +25,8 @@ app = dash.Dash(
 server = app.server
 app.title = 'Covid-19 Canada'
 #
-
+image_filename = 'testmap.png'  # replace with your own image
+encoded_image = base64.b64encode(open(image_filename, 'rb').read())
 
 dfcases = functions.gendf('Cases')
 dfmortality = functions.gendf('Mortality')
@@ -231,7 +233,11 @@ app.layout = html.Div(
                 html.Div(
                     [
                         html.Div(
-                            [dcc.Loading(dcc.Graph(id="count_graph"))],
+                            [
+                                # html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()),
+                                #          height=500)
+                                dcc.Graph(id='count_graph')
+                            ],
                             id="countGraphContainer",
                             className="pretty_container",
                             # style={'width': '100%'}
