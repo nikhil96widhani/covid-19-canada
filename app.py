@@ -588,15 +588,30 @@ def make_line_chart(val):
     fig.add_trace(go.Scatter(x=dff1.date_report, y=dff1['total_cases'], name="Confirmed",
                              line_color='deepskyblue'))
 
-    fig.add_trace(go.Scatter(x=dff2.date_death_report, y=dff2['total_mortality'], name="mortality",
-                             line_color='tomato'))
-
     fig.add_trace(go.Scatter(x=dff3.date_recovered, y=dff3['cumulative_recovered'], name="Recovered",
                              line_color='green'))
+
+    fig.add_trace(go.Scatter(x=dff2.date_death_report, y=dff2['total_mortality'], name="mortality",
+                             line_color='tomato'))
 
     # fig.update_layout(xaxis_rangeslider_visible=True)
     fig.update_layout(margin={"r": 10, "t": 80, "l": 10, "b": 10})
     fig.update_layout(
+        legend=dict(
+            x=0.1,
+            y=1,
+            traceorder="normal",
+            font=dict(
+                family="sans-serif",
+                size=12,
+                color="black"
+            ),
+            # bgcolor="LightSteelBlue",
+            # bordercolor="Black",
+            # borderwidth=2
+        ))
+    fig.update_layout(
+
         # width=450,
         # height=450,
         plot_bgcolor='rgb(255, 255, 255)')
@@ -623,6 +638,14 @@ def make_pie_chart(val):
     fig.update_layout(margin={"r": 10, "t": 35, "l": 10, "b": 10},
                       showlegend=False  # bring leadgend side
                       )
+    # # fig = px.bar(dff, x='reason', y='total',
+    # #              hover_data=['total'], color='total',
+    # #              labels={'pop': 'population of Canada'}, height=400)
+    # fig = px.bar(dff, y='total', x='reason', text='reason')
+    # # fig = px.bar(dff, y='total', x='reason', hover_data=['total'], labels={'total': 'total cases'})
+    # fig.update_traces(texttemplate='%{percent}', textposition='auto')
+    # fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide', tickformat = 'd')
+
     return fig
 
 
