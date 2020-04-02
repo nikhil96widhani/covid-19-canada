@@ -158,14 +158,14 @@ app.layout = html.Div(
                                                                   {'name': 'Deceased', 'id': 'total_mortality'}],
                                                          style_cell={
                                                              'textAlign': 'left',
-                                                             'fontSize': 16,
+                                                             'fontSize': '1.5vh',
                                                              'font-family': 'sans-serif',
                                                              'overflow': 'hidden',
                                                              'textOverflow': 'ellipsis',
                                                              'maxWidth': 0,
                                                          },
                                                          style_table={
-                                                             'maxHeight': '500px',
+                                                             'maxHeight': '700px',
                                                              'overflowY': 'scroll',
                                                              'border': 'thin lightgrey solid'
                                                          },
@@ -232,12 +232,20 @@ app.layout = html.Div(
                 ),
                 html.Div(
                     [
-                        html.Div(
-                            [
-                                # html.Img(src='data:image/png;base64,{}'.format(encoded_image.decode()),
-                                #          height=500)
-                                dcc.Graph(id='count_graph')
+                        dcc.RadioItems(
+                            id='radio_map',
+                            options=[
+                                {'label': 'Mapbox (Responsive)', 'value': 0},
+                                {'label': 'Static Plot', 'value': 1}
                             ],
+                            value=0,
+                            inputStyle={"margin-right": "10px"},
+                            labelStyle={'display': 'inline-block', "margin-right": "20px"},
+                            style={'textAlign': 'center', 'padding-top': '5px'},
+                            # className="pretty_container",
+                        ),
+                        html.Div(
+                            html.Div(id='count_graph'),
                             id="countGraphContainer",
                             className="pretty_container",
                             # style={'width': '100%'}
@@ -280,7 +288,7 @@ app.layout = html.Div(
                                                                    'id': 'text'}],
                                                          style_cell={
                                                              'textAlign': 'left',
-                                                             'fontSize': 16,
+                                                             'fontSize': '1.5vh',
                                                              'font-family': 'sans-serif',
                                                              'overflow': 'hidden',
                                                              'textOverflow': 'ellipsis',
@@ -459,11 +467,23 @@ def update_text(data):
 
 # Selectors -> count graph
 @app.callback(
-    Output("count_graph", "figure"),
-    [Input("storage", "data")],
+    Output("count_graph", "children"),
+    [Input("radio_map", "value")],
 )
 def make_count_figure(val):
-    return functions.gen_plot(dfcases)
+    if val == 0:
+        return dcc.Graph(figure=functions.gen_plot(dfcases))
+    else:
+        return html.Div([
+            html.Img(
+                src='data:image/png;base64,{}'.format(encoded_image.decode()),
+                height=470,
+                # style={
+                #     'height': '60%',
+                #     'width': '60%'
+                # }
+            )
+        ], style={'textAlign': 'center'})
 
 
 # Selectors -> count graph
