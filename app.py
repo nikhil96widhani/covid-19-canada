@@ -309,14 +309,14 @@ app.layout = html.Div(
                     [html.P("Daily new cases by time",
                             className="control_label",
                             style={'textAlign': 'center', 'fontSize': '1.8vh'}, ),
-                     dcc.Loading(dcc.Graph(id="main_graph"))],
+                     dcc.Loading(dcc.Graph(id="main_graph", config=dict(displayModeBar=False)))],
                     className="pretty_container seven columns",
                 ),
                 html.Div(
                     [html.P("Top 15 Reason of Transmission (Travel to/Reason)",
                             className="control_label",
                             style={'textAlign': 'center', 'fontSize': '1.8vh'}),
-                     dcc.Loading(dcc.Graph(id="individual_graph"))],
+                     dcc.Loading(dcc.Graph(id="individual_graph", config=dict(displayModeBar=False)))],
                     className="pretty_container five columns",
                 ),
             ],
@@ -518,7 +518,7 @@ def update_text(data):
 )
 def make_count_figure(val):
     if val == 0:
-        return dcc.Graph(figure=functions.gen_plot(dfcases))
+        return dcc.Graph(figure=functions.gen_plot(dfcases), config=dict(displayModeBar=False))
     else:
         return html.Div([
             html.Img(

@@ -4,7 +4,7 @@ import wget
 ssl._create_default_https_context = ssl._create_unverified_context
 
 def run_check():
-    threading.Timer(3600.0, run_check).start()
+    threading.Timer(21600.0, run_check).start()
 
     new_google_sheet_url = 'https://docs.google.com/spreadsheets/d/1D6okqtBS3S2NRC7GFVHzaZ67DuTw7LX49-fqSLwJyeo/export?format=xlsx'
 
@@ -12,4 +12,4 @@ def run_check():
     print("new excel generated")
 
 
-# run_check()
+run_check()
