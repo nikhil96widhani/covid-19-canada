@@ -438,37 +438,18 @@ app.layout = html.Div(
 )
 
 
-#
-# # Selectors -> well text
-# @app.callback(
-#     Output("well_text", "children"),
-#     [Input("storage", "data")],
-# )
-# def update_well_text(data):
-#     total_cases = functions.comma(len(dfcases))
-#     return total_cases
-#
-#
-# @app.callback(
-#     [
-#         Output("gasText", "children"),
-#         Output("oilText", "children"),
-#         Output("waterText", "children"),
-#     ],
-#     [Input("storage", "data")],
-# )
-# def update_text(data):
-#     total_recovered = functions.sumdf(dfrecovered, 'date_recovered', 'cumulative_recovered')
-#     total_recovered = functions.comma(total_recovered)
-#     total_testing = functions.sumdf(dftesting, 'date_testing', 'cumulative_testing')
-#     total_testing = functions.comma(total_testing)
-#
-#     return total_recovered, total_testing, len(dfmortality)
+# Selectors -> well text
+@app.callback(
+    Output("well_text", "children"),
+    [Input("storage", "data")],
+)
+def update_well_text(data):
+    total_cases = functions.comma(len(dfcases))
+    return total_cases
 
 
 @app.callback(
     [
-        Output("well_text", "children"),
         Output("gasText", "children"),
         Output("oilText", "children"),
         Output("waterText", "children"),
@@ -476,39 +457,62 @@ app.layout = html.Div(
     [Input("storage", "data")],
 )
 def update_text(data):
-    try:
-        dict_can = dict()
-        url_updates = 'https://opendata.arcgis.com/datasets/bbb2e4f589ba40d692fab712ae37b9ac_2.geojson'
-        with urllib.request.urlopen(url_updates) as url:
-            data = json.loads(url.read().decode())
-
-        for k, v in data.items():
-            v = v
-            for i in v:
-                if 'Canada' in str(i):
-                    dict_can = i
-                    break
-                else:
-                    continue
-
-        confirmed = dict_can.get('properties').get('Confirmed')
-        deaths = dict_can.get('properties').get('Deaths')
-        recovered = dict_can.get('properties').get('Recovered')
-    except:
-        confirmed = len(dfcases)
-        recovered = functions.sumdf(dfrecovered, 'date_recovered', 'cumulative_recovered')
-        deaths = len(dfmortality)
-    # else:
-    #     confirmed = 0
-    #     recovered = 0
-    #     deaths = 0
-
+    total_recovered = functions.sumdf(dfrecovered, 'date_recovered', 'cumulative_recovered')
+    # total_recovered = functions.comma(int(total_recovered))
     total_testing = functions.sumdf(dftesting, 'date_testing', 'cumulative_testing')
     total_testing = functions.comma(int(total_testing))
 
-    mortality_text = '{} ({})'.format(functions.comma(deaths), functions.get_percentage(deaths, recovered))
-    recovered_text = '{} ({})'.format(functions.comma(recovered), functions.get_percentage(recovered, deaths))
-    return functions.comma(confirmed), recovered_text, total_testing, mortality_text
+    mortality_text = '{} ({})'.format(functions.comma(int(len(dfmortality))), functions.get_percentage(len(dfmortality),
+                                                                                                  total_recovered))
+    recovered_text = '{} ({})'.format(functions.comma(int(total_recovered)), functions.get_percentage(total_recovered,
+                                                                                                      len(dfmortality)))
+
+    return recovered_text, total_testing, mortality_text
+
+
+# @app.callback(
+#     [
+#         Output("well_text", "children"),
+#         Output("gasText", "children"),
+#         Output("oilText", "children"),
+#         Output("waterText", "children"),
+#     ],
+#     [Input("storage", "data")],
+# )
+# def update_text(data):
+#     try:
+#         dict_can = dict()
+#         url_updates = 'https://opendata.arcgis.com/datasets/bbb2e4f589ba40d692fab712ae37b9ac_2.geojson'
+#         with urllib.request.urlopen(url_updates) as url:
+#             data = json.loads(url.read().decode())
+#
+#         for k, v in data.items():
+#             v = v
+#             for i in v:
+#                 if 'Canada' in str(i):
+#                     dict_can = i
+#                     break
+#                 else:
+#                     continue
+#
+#         confirmed = dict_can.get('properties').get('Confirmed')
+#         deaths = dict_can.get('properties').get('Deaths')
+#         recovered = dict_can.get('properties').get('Recovered')
+#     except:
+#         confirmed = len(dfcases)
+#         recovered = functions.sumdf(dfrecovered, 'date_recovered', 'cumulative_recovered')
+#         deaths = len(dfmortality)
+#     # else:
+#     #     confirmed = 0
+#     #     recovered = 0
+#     #     deaths = 0
+#
+#     total_testing = functions.sumdf(dftesting, 'date_testing', 'cumulative_testing')
+#     total_testing = functions.comma(int(total_testing))
+#
+#     mortality_text = '{} ({})'.format(functions.comma(deaths), functions.get_percentage(deaths, recovered))
+#     recovered_text = '{} ({})'.format(functions.comma(recovered), functions.get_percentage(recovered, deaths))
+#     return functions.comma(confirmed), recovered_text, total_testing, mortality_text
 
 
 # Selectors -> count graph
