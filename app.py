@@ -513,212 +513,216 @@ def update_text(data):
 #     return functions.comma(confirmed), recovered_text, total_testing, mortality_text
 
 
-# Selectors -> count graph
-@app.callback(
-    Output("count_graph", "children"),
-    [Input("radio_map", "value")],
-)
-def make_count_figure(val):
-    if val == 0:
-        return dcc.Graph(figure=functions.gen_plot(dfcases), config=dict(displayModeBar=False))
-    else:
-        return html.Div([
-            html.Img(
-                src='data:image/png;base64,{}'.format(encoded_image.decode()),
-                height=470,
-                # style={
-                #     'height': '60%',
-                #     'width': '60%'
-                # }
-            )
-        ], style={'textAlign': 'center'})
 
 
-# Selectors -> count graph
-@app.callback(
-    Output("reg_table", "data"),
-    [Input("storage", "data")],
-)
-def make_count_figure(val):
-    dff1 = dfcases[['province']]
-    dff1 = dff1.groupby(['province']).province.agg('count').to_frame('total_cases').reset_index()
-    dff1 = dff1.sort_values('total_cases', ascending=False)
-
-    dff2 = dfrecovered[['province', 'date_recovered', 'cumulative_recovered']].copy()
-    dff2['date_recovered'] = pd.to_datetime(dff2['date_recovered'])
-    dff2 = dff2.sort_values(by='date_recovered', ascending=False)
-    dff2 = dff2.drop_duplicates(subset=['province'], keep='first')
-    dff2 = dff2.rename(columns={'cumulative_recovered': 'total_recovered'})
-    dff2 = dff2[['province', 'total_recovered']]
-    # dff2 = dff2.groupby(['province']).province.agg('count').to_frame('total_recovered').reset_index()
-
-    dff3 = dfmortality[['province']]
-    dff3 = dff3.groupby(['province']).province.agg('count').to_frame('total_mortality').reset_index()
-
-    dff = pd.merge(dff1, dff2, how='left', on='province')
-    dff = pd.merge(dff, dff3, how='left', on='province')
-    dff = dff.fillna(0)
-
-    data = dff.to_dict('rows')
-
-    return data
 
 
-# Selectors -> count graph
-@app.callback(
-    Output("main_graph", "figure"),
-    [Input("storage", "data")],
-)
-def make_line_chart(val):
-    dff1 = dfcases[['date_report']].copy()
-    dff1 = dff1.groupby('date_report').date_report.agg('count').to_frame('total_cases').reset_index()
-
-    dff2 = dfmortality[['date_death_report']].copy()
-    dff2 = dff2.groupby('date_death_report').date_death_report.agg('count').to_frame('total_mortality').reset_index()
-
-    dff3 = dfrecovered[['date_recovered', 'cumulative_recovered', 'province']].copy()
-    dff3['date_recovered'] = pd.to_datetime(dff3['date_recovered'])
-    dff3 = dff3.sort_values(by='date_recovered', ascending=False)
-    dff3['cumulative_recovered'] = dff3['cumulative_recovered'].fillna(0)
-    dff3 = dff3.groupby('date_recovered', as_index=False).agg({'cumulative_recovered': 'sum'})
-    dff3['cumulative_recovered2'] = dff3['cumulative_recovered']
-    dff3.cumulative_recovered2 = dff3.cumulative_recovered2.shift(1)
-    dff3['cumulative_recovered2'] = dff3['cumulative_recovered2'].fillna(0)
-    dff3['cumulative_recovered'] = dff3['cumulative_recovered'] - dff3['cumulative_recovered2']
-
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=dff1.date_report, y=dff1['total_cases'], name="Confirmed",
-                             line_color='deepskyblue'))
-
-    fig.add_trace(go.Scatter(x=dff3.date_recovered, y=dff3['cumulative_recovered'], name="Recovered",
-                             line_color='green'))
-
-    fig.add_trace(go.Scatter(x=dff2.date_death_report, y=dff2['total_mortality'], name="mortality",
-                             line_color='tomato'))
-
-    # fig.update_layout(xaxis_rangeslider_visible=True)
-    fig.update_layout(margin={"r": 10, "t": 80, "l": 10, "b": 10})
-    fig.update_layout(
-        legend=dict(
-            x=0.1,
-            y=1,
-            traceorder="normal",
-            font=dict(
-                family="sans-serif",
-                size=12,
-                color="black"
-            ),
-            # bgcolor="LightSteelBlue",
-            # bordercolor="Black",
-            # borderwidth=2
-        ))
-    fig.update_layout(
-
-        # width=450,
-        # height=450,
-        plot_bgcolor='rgb(255, 255, 255)')
-    return fig
-
-
-@app.callback(
-    Output("individual_graph", "figure"),
-    [Input("storage", "data")],
-)
-def make_pie_chart(val):
-    dff = pd.DataFrame(columns=['reason'])
-    dff['reason'] = dfcases['travel_history_country'].combine_first(dfcases['locally_acquired'])
-    dff = dff['reason'].str.split(',', expand=True).stack().reset_index(level=1, drop=True).to_frame()
-    dff = dff.rename(columns={0: 'reason'})
-    dff['reason'] = dff['reason'].replace({'Close contact': 'Close Contact'})
-    dff = dff.groupby('reason').reason.agg('count').to_frame('total').reset_index()
-    dff = dff.sort_values(by='total', ascending=False)
-    dff = dff.head(15)
-
-    fig = px.pie(dff, values='total', names='reason',
-                 hover_data=['total'], labels={'total': 'total cases'})
-    fig.update_traces(textposition='inside', textinfo='percent+label')
-    fig.update_layout(margin={"r": 10, "t": 35, "l": 10, "b": 10},
-                      showlegend=False  # bring leadgend side
-                      )
-    # # fig = px.bar(dff, x='reason', y='total',
-    # #              hover_data=['total'], color='total',
-    # #              labels={'pop': 'population of Canada'}, height=400)
-    # fig = px.bar(dff, y='total', x='reason', text='reason')
-    # # fig = px.bar(dff, y='total', x='reason', hover_data=['total'], labels={'total': 'total cases'})
-    # fig.update_traces(texttemplate='%{percent}', textposition='auto')
-    # fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide', tickformat = 'd')
-
-    return fig
-
-
-@app.callback(
-    Output("news_table", "data"),
-    [Input("storage", "data")],
-)
-def make_count_figure(val):
-    dff = dfcases[
-        ['case_id', 'age', 'sex', 'health_region', 'date_report', 'travel_history_country', 'locally_acquired']]
-    dff = dff.sort_values(by=['case_id'], ascending=False)
-    dff = dff.dropna(subset=['age', 'sex', 'health_region'], how='all')
-    dff['reason'] = dff['travel_history_country'].combine_first(dff['locally_acquired'])
-    dff['reason'] = dff['reason'].fillna("Unknown")
-    dff['text'] = 'A person of ' + dff['sex'].astype(str) + ' gender' + ' who was in their ' \
-                  + dff['age'].astype(str) + ' age group ' + ' from ' + dff['health_region'].astype(str) + \
-                  ' acquired virus from travel to/reason of : ' + dff['reason'].astype(str)
-    dff2 = dff.head(100)
-    data = dff2.to_dict('rows')
-
-    return data
-
-
-@app.callback(
-    Output("confirmed_city_text", "children"),
-    [Input("city_dropdown_confirmed", "value")],
-)
-def confirmed_city(value):
-    dff = dfcases[['health_region']]
-    dff = dff.groupby('health_region').health_region.agg('count').to_frame('total_cases').reset_index()
-    dff = dff[dff['health_region'].str.contains(value)].reset_index()
-    if len(dff) > 0:
-        count = dff.iloc[0]['total_cases']
-    else:
-        count = 'No Data for'
-
-    return '{} CONFIRMED cases in {}'.format(count, value)
-
-
-@app.callback(
-    Output("recovered_city_text", "children"),
-    [Input("city_dropdown_recovered", "value")],
-)
-def recovered_city(value):
-    dff = dfrecovered[['date_recovered', 'province', 'cumulative_recovered']]
-    dff = dff.fillna(0)
-    dff = dff.sort_values(by='date_recovered', ascending=False)
-    dff = dff.drop_duplicates(subset='province', keep='first', inplace=False)
-    dff = dff[dff['province'].str.contains(value)].reset_index()
-    if len(dff) > 0:
-        count = dff.iloc[0]['cumulative_recovered']
-    else:
-        count = 'No Data for'
-
-    return '{} RECOVERED cases in {}'.format(count, value)
-
-
-@app.callback(
-    Output("mortality_city_text", "children"),
-    [Input("city_dropdown_mortality", "value")],
-)
-def mortality_city(value):
-    dff = dfmortality[['health_region']]
-    dff = dff.groupby('health_region').health_region.agg('count').to_frame('total_cases').reset_index()
-    dff = dff[dff['health_region'].str.contains(value)].reset_index()
-    if len(dff) > 0:
-        count = dff.iloc[0]['total_cases']
-    else:
-        count = 'No Data for'
-
-    return '{} DEATHS in {}'.format(count, value)
+# # Selectors -> count graph
+# @app.callback(
+#     Output("count_graph", "children"),
+#     [Input("radio_map", "value")],
+# )
+# def make_count_figure(val):
+#     if val == 0:
+#         return dcc.Graph(figure=functions.gen_plot(dfcases), config=dict(displayModeBar=False))
+#     else:
+#         return html.Div([
+#             html.Img(
+#                 src='data:image/png;base64,{}'.format(encoded_image.decode()),
+#                 height=470,
+#                 # style={
+#                 #     'height': '60%',
+#                 #     'width': '60%'
+#                 # }
+#             )
+#         ], style={'textAlign': 'center'})
+#
+#
+# # Selectors -> count graph
+# @app.callback(
+#     Output("reg_table", "data"),
+#     [Input("storage", "data")],
+# )
+# def make_count_figure(val):
+#     dff1 = dfcases[['province']]
+#     dff1 = dff1.groupby(['province']).province.agg('count').to_frame('total_cases').reset_index()
+#     dff1 = dff1.sort_values('total_cases', ascending=False)
+#
+#     dff2 = dfrecovered[['province', 'date_recovered', 'cumulative_recovered']].copy()
+#     dff2['date_recovered'] = pd.to_datetime(dff2['date_recovered'])
+#     dff2 = dff2.sort_values(by='date_recovered', ascending=False)
+#     dff2 = dff2.drop_duplicates(subset=['province'], keep='first')
+#     dff2 = dff2.rename(columns={'cumulative_recovered': 'total_recovered'})
+#     dff2 = dff2[['province', 'total_recovered']]
+#     # dff2 = dff2.groupby(['province']).province.agg('count').to_frame('total_recovered').reset_index()
+#
+#     dff3 = dfmortality[['province']]
+#     dff3 = dff3.groupby(['province']).province.agg('count').to_frame('total_mortality').reset_index()
+#
+#     dff = pd.merge(dff1, dff2, how='left', on='province')
+#     dff = pd.merge(dff, dff3, how='left', on='province')
+#     dff = dff.fillna(0)
+#
+#     data = dff.to_dict('rows')
+#
+#     return data
+#
+#
+# # Selectors -> count graph
+# @app.callback(
+#     Output("main_graph", "figure"),
+#     [Input("storage", "data")],
+# )
+# def make_line_chart(val):
+#     dff1 = dfcases[['date_report']].copy()
+#     dff1 = dff1.groupby('date_report').date_report.agg('count').to_frame('total_cases').reset_index()
+#
+#     dff2 = dfmortality[['date_death_report']].copy()
+#     dff2 = dff2.groupby('date_death_report').date_death_report.agg('count').to_frame('total_mortality').reset_index()
+#
+#     dff3 = dfrecovered[['date_recovered', 'cumulative_recovered', 'province']].copy()
+#     dff3['date_recovered'] = pd.to_datetime(dff3['date_recovered'])
+#     dff3 = dff3.sort_values(by='date_recovered', ascending=False)
+#     dff3['cumulative_recovered'] = dff3['cumulative_recovered'].fillna(0)
+#     dff3 = dff3.groupby('date_recovered', as_index=False).agg({'cumulative_recovered': 'sum'})
+#     dff3['cumulative_recovered2'] = dff3['cumulative_recovered']
+#     dff3.cumulative_recovered2 = dff3.cumulative_recovered2.shift(1)
+#     dff3['cumulative_recovered2'] = dff3['cumulative_recovered2'].fillna(0)
+#     dff3['cumulative_recovered'] = dff3['cumulative_recovered'] - dff3['cumulative_recovered2']
+#
+#     fig = go.Figure()
+#     fig.add_trace(go.Scatter(x=dff1.date_report, y=dff1['total_cases'], name="Confirmed",
+#                              line_color='deepskyblue'))
+#
+#     fig.add_trace(go.Scatter(x=dff3.date_recovered, y=dff3['cumulative_recovered'], name="Recovered",
+#                              line_color='green'))
+#
+#     fig.add_trace(go.Scatter(x=dff2.date_death_report, y=dff2['total_mortality'], name="mortality",
+#                              line_color='tomato'))
+#
+#     # fig.update_layout(xaxis_rangeslider_visible=True)
+#     fig.update_layout(margin={"r": 10, "t": 80, "l": 10, "b": 10})
+#     fig.update_layout(
+#         legend=dict(
+#             x=0.1,
+#             y=1,
+#             traceorder="normal",
+#             font=dict(
+#                 family="sans-serif",
+#                 size=12,
+#                 color="black"
+#             ),
+#             # bgcolor="LightSteelBlue",
+#             # bordercolor="Black",
+#             # borderwidth=2
+#         ))
+#     fig.update_layout(
+#
+#         # width=450,
+#         # height=450,
+#         plot_bgcolor='rgb(255, 255, 255)')
+#     return fig
+#
+#
+# @app.callback(
+#     Output("individual_graph", "figure"),
+#     [Input("storage", "data")],
+# )
+# def make_pie_chart(val):
+#     dff = pd.DataFrame(columns=['reason'])
+#     dff['reason'] = dfcases['travel_history_country'].combine_first(dfcases['locally_acquired'])
+#     dff = dff['reason'].str.split(',', expand=True).stack().reset_index(level=1, drop=True).to_frame()
+#     dff = dff.rename(columns={0: 'reason'})
+#     dff['reason'] = dff['reason'].replace({'Close contact': 'Close Contact'})
+#     dff = dff.groupby('reason').reason.agg('count').to_frame('total').reset_index()
+#     dff = dff.sort_values(by='total', ascending=False)
+#     dff = dff.head(15)
+#
+#     fig = px.pie(dff, values='total', names='reason',
+#                  hover_data=['total'], labels={'total': 'total cases'})
+#     fig.update_traces(textposition='inside', textinfo='percent+label')
+#     fig.update_layout(margin={"r": 10, "t": 35, "l": 10, "b": 10},
+#                       showlegend=False  # bring leadgend side
+#                       )
+#     # # fig = px.bar(dff, x='reason', y='total',
+#     # #              hover_data=['total'], color='total',
+#     # #              labels={'pop': 'population of Canada'}, height=400)
+#     # fig = px.bar(dff, y='total', x='reason', text='reason')
+#     # # fig = px.bar(dff, y='total', x='reason', hover_data=['total'], labels={'total': 'total cases'})
+#     # fig.update_traces(texttemplate='%{percent}', textposition='auto')
+#     # fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide', tickformat = 'd')
+#
+#     return fig
+#
+#
+# @app.callback(
+#     Output("news_table", "data"),
+#     [Input("storage", "data")],
+# )
+# def make_count_figure(val):
+#     dff = dfcases[
+#         ['case_id', 'age', 'sex', 'health_region', 'date_report', 'travel_history_country', 'locally_acquired']]
+#     dff = dff.sort_values(by=['case_id'], ascending=False)
+#     dff = dff.dropna(subset=['age', 'sex', 'health_region'], how='all')
+#     dff['reason'] = dff['travel_history_country'].combine_first(dff['locally_acquired'])
+#     dff['reason'] = dff['reason'].fillna("Unknown")
+#     dff['text'] = 'A person of ' + dff['sex'].astype(str) + ' gender' + ' who was in their ' \
+#                   + dff['age'].astype(str) + ' age group ' + ' from ' + dff['health_region'].astype(str) + \
+#                   ' acquired virus from travel to/reason of : ' + dff['reason'].astype(str)
+#     dff2 = dff.head(100)
+#     data = dff2.to_dict('rows')
+#
+#     return data
+#
+#
+# @app.callback(
+#     Output("confirmed_city_text", "children"),
+#     [Input("city_dropdown_confirmed", "value")],
+# )
+# def confirmed_city(value):
+#     dff = dfcases[['health_region']]
+#     dff = dff.groupby('health_region').health_region.agg('count').to_frame('total_cases').reset_index()
+#     dff = dff[dff['health_region'].str.contains(value)].reset_index()
+#     if len(dff) > 0:
+#         count = dff.iloc[0]['total_cases']
+#     else:
+#         count = 'No Data for'
+#
+#     return '{} CONFIRMED cases in {}'.format(count, value)
+#
+#
+# @app.callback(
+#     Output("recovered_city_text", "children"),
+#     [Input("city_dropdown_recovered", "value")],
+# )
+# def recovered_city(value):
+#     dff = dfrecovered[['date_recovered', 'province', 'cumulative_recovered']]
+#     dff = dff.fillna(0)
+#     dff = dff.sort_values(by='date_recovered', ascending=False)
+#     dff = dff.drop_duplicates(subset='province', keep='first', inplace=False)
+#     dff = dff[dff['province'].str.contains(value)].reset_index()
+#     if len(dff) > 0:
+#         count = dff.iloc[0]['cumulative_recovered']
+#     else:
+#         count = 'No Data for'
+#
+#     return '{} RECOVERED cases in {}'.format(count, value)
+#
+#
+# @app.callback(
+#     Output("mortality_city_text", "children"),
+#     [Input("city_dropdown_mortality", "value")],
+# )
+# def mortality_city(value):
+#     dff = dfmortality[['health_region']]
+#     dff = dff.groupby('health_region').health_region.agg('count').to_frame('total_cases').reset_index()
+#     dff = dff[dff['health_region'].str.contains(value)].reset_index()
+#     if len(dff) > 0:
+#         count = dff.iloc[0]['total_cases']
+#     else:
+#         count = 'No Data for'
+#
+#     return '{} DEATHS in {}'.format(count, value)
 
 
 if __name__ == '__main__':
