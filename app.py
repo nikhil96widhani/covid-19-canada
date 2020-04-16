@@ -9,15 +9,13 @@ from functions import functions
 import os
 from datetime import datetime
 import dash_table
-import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
-import urllib.request, json
 import base64
 
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("data").resolve()
-# load_data.run_check()
+
 ########### Initiate the app
 app = dash.Dash(
     __name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}]
@@ -463,7 +461,7 @@ def update_text(data):
     total_testing = functions.comma(int(total_testing))
 
     mortality_text = '{} ({})'.format(functions.comma(int(len(dfmortality))), functions.get_percentage(len(dfmortality),
-                                                                                                  total_recovered))
+                                                                                                       total_recovered))
     recovered_text = '{} ({})'.format(functions.comma(int(total_recovered)), functions.get_percentage(total_recovered,
                                                                                                       len(dfmortality)))
 
