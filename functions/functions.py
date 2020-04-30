@@ -1,6 +1,8 @@
 import pandas as pd
 import plotly.graph_objects as go
 import numpy as np
+
+
 # import passwords
 
 
@@ -21,7 +23,7 @@ def sumdf(dff, dt_col, sum_col):
         dff = dff[dff[sum_col].notna()]
         total = dff[sum_col].sum()
     except:
-        total=000000
+        total = 000000
 
     return total
 
@@ -143,4 +145,5 @@ def comma(num):
 
 
 def get_percentage(a, b):
-    return '{0:.2f}%'.format((int(a) / int(a+b) * 100))
+    return '{0:.2f}%'.format((int(a) / int(a + b) * 100))
+
