@@ -2,6 +2,8 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
+from functions import load_data
+from functions import functions
 
 ########### Define your variables
 beers=['Chesapeake Stout', 'Snake Dog IPA', 'Imperial Porter', 'Double Dog IPA']
@@ -38,6 +40,11 @@ beer_layout = go.Layout(
 )
 
 beer_fig = go.Figure(data=beer_data, layout=beer_layout)
+
+dfcases = functions.gendf('Cases')
+dfmortality = functions.gendf('Mortality')
+dfrecovered = functions.gendf('Recovered')
+dftesting = functions.gendf('Testing')
 
 
 ########### Initiate the app
