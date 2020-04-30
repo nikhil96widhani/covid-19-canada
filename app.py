@@ -16,6 +16,12 @@ import base64
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("data").resolve()
 
+dfcases = functions.gendf('Cases')
+dfmortality = functions.gendf('Mortality')
+dfrecovered = functions.gendf('Recovered')
+dftesting = functions.gendf('Testing')
+
+
 ########### Initiate the app
 app = dash.Dash(
     __name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}]
@@ -26,10 +32,10 @@ app.title = 'Covid-19 Canada'
 image_filename = 'testmap.png'  # replace with your own image
 encoded_image = base64.b64encode(open(image_filename, 'rb').read())
 
-dfcases = functions.gendf('Cases')
-dfmortality = functions.gendf('Mortality')
-dfrecovered = functions.gendf('Recovered')
-dftesting = functions.gendf('Testing')
+# dfcases = functions.gendf('Cases')
+# dfmortality = functions.gendf('Mortality')
+# dfrecovered = functions.gendf('Recovered')
+# dftesting = functions.gendf('Testing')
 
 dropdown_cities_confirmed = dfcases['health_region'].unique()
 dropdown_cities_recovered = dfrecovered['province'].unique()
