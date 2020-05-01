@@ -155,9 +155,10 @@ app.layout = html.Div(
             ],
             className="row flex-display",
         ),
-        html.Marquee("Few days ago data source format was changed, accuracy after this line is compromised. "
-                     "New update will be pushed on the weekend", dir='ltr',
-                     style={'font-weight': 'bold', 'fontSize': '2vh', "margin-bottom": "10px"}),
+        html.Div("Few days ago data source format was changed, accuracy after this line is compromised. "
+                 "New update will be pushed on the weekend",
+                 style={'font-weight': 'bold', 'fontSize': '2vh', "margin-bottom": "10px", 'textAlign': 'center',
+                        "border": "2px red solid"}),
         # html.Div(
         #     [
         #         html.Div(
@@ -470,9 +471,9 @@ def update_text(data):
         y = []
         for link in soup.find_all('div', class_='maincounter-number'):
             y.append(link.text.strip())
-        confirmed = int(re.sub('\W+','', y[0]))
-        deaths = int(re.sub('\W+','', y[1]))
-        recovered = int(re.sub('\W+','', y[2]))
+        confirmed = int(re.sub('\W+', '', y[0]))
+        deaths = int(re.sub('\W+', '', y[1]))
+        recovered = int(re.sub('\W+', '', y[2]))
     except:
         try:
             dict_can = dict()
@@ -496,8 +497,6 @@ def update_text(data):
             confirmed = len(dfcases)
             recovered = functions.sumdf(dfrecovered, 'date_recovered', 'cumulative_recovered')
             deaths = len(dfmortality)
-
-
 
     # URL = 'https://www.worldometers.info/coronavirus/country/canada/'
     # page = requests.get(URL)
