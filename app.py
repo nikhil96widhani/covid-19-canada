@@ -152,9 +152,9 @@ app.layout = html.Div(
             ],
             className="row flex-display",
         ),
-        html.Marquee("Few days ago data source format was changed. Accuracy after this line is compromised. "
+        html.Marquee("Few days ago data source format was changed, accuracy after this line is compromised. "
                      "New update will be pushed on the weekend", dir='ltr',
-                     style={'font-weight': 'bold', 'fontSize': '2vh', "margin-bottom": "0px"}),
+                     style={'font-weight': 'bold', 'fontSize': '2vh', "margin-bottom": "10px"}),
         # html.Div(
         #     [
         #         html.Div(
