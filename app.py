@@ -14,7 +14,10 @@ import plotly.express as px
 import base64
 import urllib.request
 import json
+import re
 import ssl
+import requests
+from bs4 import BeautifulSoup
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -460,31 +463,76 @@ app.layout = html.Div(
 )
 def update_text(data):
     try:
-        dict_can = dict()
-        url_updates = 'https://opendata.arcgis.com/datasets/bbb2e4f589ba40d692fab712ae37b9ac_2.geojson'
-        with urllib.request.urlopen(url_updates) as url:
-            data = json.loads(url.read().decode())
+        URL_numbers = 'https://www.worldometers.info/coronavirus/country/canada/'
+        page = requests.get(URL_numbers)
 
-        for k, v in data.items():
-            v = v
-            for i in v:
-                if 'Canada' in str(i):
-                    dict_can = i
-                    break
-                else:
-                    continue
-
-        confirmed = dict_can.get('properties').get('Confirmed')
-        deaths = dict_can.get('properties').get('Deaths')
-        recovered = dict_can.get('properties').get('Recovered')
+        soup = BeautifulSoup(page.content, 'html.parser')
+        y = []
+        for link in soup.find_all('div', class_='maincounter-number'):
+            y.append(link.text.strip())
+        confirmed = int(re.sub('\W+','', y[0]))
+        deaths = int(re.sub('\W+','', y[1]))
+        recovered = int(re.sub('\W+','', y[2]))
     except:
-        confirmed = len(dfcases)
-        recovered = functions.sumdf(dfrecovered, 'date_recovered', 'cumulative_recovered')
-        deaths = len(dfmortality)
-    # else:
-    #     confirmed = 0
-    #     recovered = 0
-    #     deaths = 0
+        try:
+            dict_can = dict()
+            url_updates = 'https://opendata.arcgis.com/datasets/bbb2e4f589ba40d692fab712ae37b9ac_2.geojson'
+            with urllib.request.urlopen(url_updates) as url:
+                data = json.loads(url.read().decode())
+
+            for k, v in data.items():
+                v = v
+                for i in v:
+                    if 'Canada' in str(i):
+                        dict_can = i
+                        break
+                    else:
+                        continue
+
+            confirmed = dict_can.get('properties').get('Confirmed')
+            deaths = dict_can.get('properties').get('Deaths')
+            recovered = dict_can.get('properties').get('Recovered')
+        except:
+            confirmed = len(dfcases)
+            recovered = functions.sumdf(dfrecovered, 'date_recovered', 'cumulative_recovered')
+            deaths = len(dfmortality)
+
+
+
+    # URL = 'https://www.worldometers.info/coronavirus/country/canada/'
+    # page = requests.get(URL)
+    #
+    # soup = BeautifulSoup(page.content, 'html.parser')
+    # y = []
+    # for link in soup.find_all('div', class_='maincounter-number'):
+    #     y.append(link.text.strip())
+    #     print(link.text.strip())
+    # try:
+    #     dict_can = dict()
+    #     url_updates = 'https://opendata.arcgis.com/datasets/bbb2e4f589ba40d692fab712ae37b9ac_2.geojson'
+    #     with urllib.request.urlopen(url_updates) as url:
+    #         data = json.loads(url.read().decode())
+    #
+    #     for k, v in data.items():
+    #         v = v
+    #         for i in v:
+    #             if 'Canada' in str(i):
+    #                 dict_can = i
+    #                 break
+    #             else:
+    #                 continue
+    #
+    #     confirmed = dict_can.get('properties').get('Confirmed')
+    #     deaths = dict_can.get('properties').get('Deaths')
+    #     recovered = dict_can.get('properties').get('Recovered')
+    # except:
+    #     confirmed = len(dfcases)
+    #     recovered = functions.sumdf(dfrecovered, 'date_recovered', 'cumulative_recovered')
+    #     deaths = len(dfmortality)
+    # # else:
+    # #     confirmed = 0
+    # #     recovered = 0
+    # #     deaths = 0
 
     total_testing = functions.sumdf(dftesting, 'date_testing', 'cumulative_testing')
     total_testing = functions.comma(int(total_testing))
