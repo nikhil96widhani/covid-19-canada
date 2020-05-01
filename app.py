@@ -12,6 +12,8 @@ import dash_html_components as html
 # import plotly.graph_objects as go
 # import plotly.express as px
 # import base64
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("data").resolve()
@@ -22,6 +24,22 @@ app = dash.Dash(
 )
 server = app.server
 app.title = 'Covid-19 Canada'
+
+url_cases = 'https://raw.githubusercontent.com/ishaberry/Covid19Canada/master/cases.csv'
+url_mortality = 'https://raw.githubusercontent.com/ishaberry/Covid19Canada/master/mortality.csv'
+url_recovered = 'https://raw.githubusercontent.com/ishaberry/Covid19Canada/master/recovered_cumulative.csv'
+url_testing = 'https://raw.githubusercontent.com/ishaberry/Covid19Canada/master/testing_cumulative.csv'
+
+dfcases = pd.read_csv(url_cases)
+dfmortality = pd.read_csv(url_mortality)
+dfrecovered = pd.read_csv(url_recovered)
+dftesting = pd.read_csv(url_testing)
+
+
+
+# dfFips = pd.read_csv(fips)
+# dfFips = dfFips[dfFips['Country_Region'] == 'Canada'].reset_index(drop=True)
+# dfFips['test'] = 'MN'
 
 ########### Set up the layout
 app.layout = html.Div(
