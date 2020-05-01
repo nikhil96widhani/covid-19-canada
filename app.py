@@ -5,13 +5,15 @@ from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
 # from functions import load_data
-# from functions import functions
-# import os
-# from datetime import datetime
-# import dash_table
-# import plotly.graph_objects as go
-# import plotly.express as px
-# import base64
+from functions import functions
+import os
+from datetime import datetime
+import dash_table
+import plotly.graph_objects as go
+import plotly.express as px
+import base64
+import urllib.request
+import json
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -75,7 +77,7 @@ app.layout = html.Div(
                                 ),
                                 html.H5(
                                     "Last Updated today "
-                                    # .format(str(time)[:-10])
+                                        # .format(str(time)[:-10])
                                     ,
                                     style={"margin-top": "0px"}
                                 ),
@@ -147,10 +149,344 @@ app.layout = html.Div(
             ],
             className="row flex-display",
         ),
+        # html.Div(
+        #     [
+        #         html.Div(
+        #             [dcc.Loading(html.H6(id="well_text",
+        #                                  style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+        #                                  )),
+        #              html.P("CONFIRMED",
+        #                     style={'color': 'white', 'fontSize': '2vh'}
+        #                     )],
+        #             id="wells",
+        #             className="mini_container",
+        #             style={'backgroundColor': '#0099e5'}
+        #         ),
+        #         html.Div(
+        #             [dcc.Loading(html.H6(id="gasText",
+        #                                  style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+        #                                  )),
+        #              html.P("RECOVERED",
+        #                     style={'color': 'white', 'fontSize': '2vh'}
+        #                     )],
+        #             id="gas",
+        #             className="mini_container",
+        #             style={'backgroundColor': '#6cc644'}
+        #         ),
+        #         html.Div(
+        #             [dcc.Loading(html.H6(id="waterText",
+        #                                  style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+        #                                  )),
+        #              html.P("DECEASED",
+        #                     style={'color': 'white', 'fontSize': '2vh'}
+        #                     )],
+        #             id="water",
+        #             className="mini_container",
+        #             style={'backgroundColor': 'rgb(255,27,14)'}
+        #         ),
+        #         html.Div(
+        #             [dcc.Loading(html.H6(id="oilText",
+        #                                  style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+        #                                  )),
+        #              html.P("TESTED",
+        #                     style={'color': 'white', 'fontSize': '2vh'}
+        #                     )],
+        #             id="oil",
+        #             className="mini_container",
+        #             style={'backgroundColor': '#fbbc05'}
+        #         ),
+        #     ],
+        #     className="row flex-display",
+        # ),
+        html.Div(
+            [
+                html.Div(
+                    [
+                        dcc.Loading(dash_table.DataTable(id='reg_table',
+                                                         columns=[{'name': 'Province', 'id': 'province'},
+                                                                  {'name': 'Confirmed', 'id': 'total_cases'},
+                                                                  {'name': 'Recovered', 'id': 'total_recovered'},
+                                                                  {'name': 'Deceased', 'id': 'total_mortality'}],
+                                                         style_cell={
+                                                             'textAlign': 'left',
+                                                             'fontSize': '1.5vh',
+                                                             'font-family': 'sans-serif',
+                                                             'overflow': 'hidden',
+                                                             'textOverflow': 'ellipsis',
+                                                             'maxWidth': 0,
+                                                         },
+                                                         style_table={
+                                                             'maxHeight': '700px',
+                                                             'overflowY': 'scroll',
+                                                             'border': 'thin lightgrey solid'
+                                                         },
+                                                         style_data={
+                                                             'whiteSpace': 'normal',
+                                                             'height': 'auto'
+                                                         },
+                                                         style_cell_conditional=[
+                                                             {
+                                                                 'if': {'column_id': 'province'},
+                                                                 'padding-left': '10px'
+                                                             },
+                                                             {
+                                                                 'if': {'column_id': 'total_cases'},
+                                                                 'textAlign': 'center',
+                                                                 'width': '20%'
+                                                             },
+                                                             {
+                                                                 'if': {'column_id': 'total_recovered'},
+                                                                 'textAlign': 'center',
+                                                                 'width': '20%'
+                                                             },
+                                                             {
+                                                                 'if': {'column_id': 'total_mortality'},
+                                                                 'textAlign': 'center',
+                                                                 'width': '20%'
+                                                             }
+
+                                                         ],
+                                                         style_data_conditional=[
+                                                             {
+                                                                 'if': {'row_index': 'odd'},
+                                                                 'backgroundColor': 'rgb(248, 248, 248)'
+                                                             },
+                                                             {
+                                                                 'if': {'column_id': 'total_cases'},
+                                                                 'backgroundColor': '#8ad8ff',
+                                                                 'color': 'black',
+                                                             },
+                                                             {
+                                                                 'if': {'column_id': 'total_recovered'},
+                                                                 'backgroundColor': '#a6dc8e',
+                                                                 'color': 'black',
+                                                             },
+                                                             {
+                                                                 'if': {'column_id': 'total_mortality'},
+                                                                 'backgroundColor': '#ff8680',
+                                                                 'color': 'black',
+                                                             },
+                                                         ],
+                                                         style_header={
+                                                             'backgroundColor': 'rgb(230, 230, 230)',
+                                                             'fontWeight': 'bold',
+                                                         },
+                                                         style_as_list_view=True,
+                                                         )),
+                        html.P(
+                            "*Filtered by most Confirmed cases first",
+                            className="control_label",
+                        ),
+                    ],
+                    className="pretty_container four columns",
+                    id="cross-filter-options",
+                ),
+                html.Div(
+                    [
+                        dcc.RadioItems(
+                            id='radio_map',
+                            options=[
+                                {'label': 'Mapbox (Responsive)', 'value': 0},
+                                {'label': 'Static Plot', 'value': 1}
+                            ],
+                            value=0,
+                            inputStyle={"margin-right": "10px"},
+                            labelStyle={'display': 'inline-block', "margin-right": "20px"},
+                            style={'textAlign': 'center', 'padding-bottom': '5px'},
+                            # className="pretty_container",
+                        ),
+                        html.Div(
+                            html.Div(id='count_graph'),
+                            id="countGraphContainer",
+                            # className="pretty_container",
+                            # style={'width': '100%'}
+                        ),
+                    ],
+                    id="right-column",
+                    className="pretty_container eight columns",
+                ),
+            ],
+            className="row flex-display",
+        ),
+        html.Div(
+            [
+                html.Div(
+                    [html.P("Daily new cases by time",
+                            className="control_label",
+                            style={'textAlign': 'center', 'fontSize': '1.8vh'}, ),
+                     dcc.Loading(dcc.Graph(id="main_graph", config=dict(displayModeBar=False)))],
+                    className="pretty_container seven columns",
+                ),
+                html.Div(
+                    [html.P("Top 15 Reason of Transmission (Travel to/Reason)",
+                            className="control_label",
+                            style={'textAlign': 'center', 'fontSize': '1.8vh'}),
+                     dcc.Loading(dcc.Graph(id="individual_graph", config=dict(displayModeBar=False)))],
+                    className="pretty_container five columns",
+                ),
+            ],
+            className="row flex-display",
+        ),
+        html.Div(
+            [
+                html.Div(
+                    [
+                        # html.P("Top 15 Reason of Transmission (Travel to/Reason)",
+                        #        className="control_label",
+                        #        style={'textAlign': 'center', 'fontSize': '1.8vh'}),
+                        dcc.Loading(dash_table.DataTable(id='news_table',
+                                                         columns=[{'name': 'NEWS: Latest Confirmed Case details',
+                                                                   'id': 'text'}],
+                                                         style_cell={
+                                                             'textAlign': 'left',
+                                                             'fontSize': '1.5vh',
+                                                             'font-family': 'sans-serif',
+                                                             'overflow': 'hidden',
+                                                             'textOverflow': 'ellipsis',
+                                                             'maxWidth': 0,
+                                                         },
+                                                         style_table={
+                                                             'maxHeight': '500px',
+                                                             'overflowY': 'scroll',
+                                                             'border': 'thin lightgrey solid'
+                                                         },
+                                                         style_data={
+                                                             'whiteSpace': 'normal',
+                                                             'height': 'auto'
+                                                         },
+                                                         style_cell_conditional=[
+                                                             {
+                                                                 'if': {'column_id': 'text'},
+                                                                 'padding-left': '10px'
+                                                             },
+                                                         ],
+                                                         style_data_conditional=[
+                                                             {
+                                                                 'if': {'row_index': 'odd'},
+                                                                 'backgroundColor': '#d7f2ff'
+                                                             },
+                                                             {
+                                                                 'if': {'column_id': 'total_cases'},
+                                                                 'backgroundColor': '#d7f2ff',
+                                                                 'color': 'black',
+                                                             },
+                                                         ],
+                                                         style_header={
+                                                             'backgroundColor': '#d7f2ff',
+                                                             'fontWeight': 'bold',
+                                                             'textAlign': 'center',
+                                                         },
+                                                         # fixed_rows={'headers': True, 'data': 0},
+                                                         style_as_list_view=True,
+                                                         ))],
+                    className="pretty_container six columns",
+                ),
+                # html.Div(
+                #     [
+                #         html.P("Case Count by City (type/select a city)",
+                #                className="control_label",
+                #                style={'textAlign': 'center', 'fontSize': '1.8vh'}),
+                #         html.Div(
+                #             [dcc.Dropdown(
+                #                 id='city_dropdown_confirmed',
+                #                 options=[{'label': i, 'value': i} for i in dropdown_cities_confirmed],
+                #                 value='Ottawa',
+                #                 className="dcc_controls",
+                #                 placeholder='All Departments'
+                #             ),
+                #                 dcc.Loading(html.P(id='confirmed_city_text',
+                #                                    style={'color': 'white', 'fontSize': '2vh', 'padding-top': '15px'}
+                #                                    ))],
+                #             id="welldss",
+                #             className="mini_container",
+                #             style={'backgroundColor': '#0099e5'}
+                #         ),
+                #         html.Div(
+                #             [dcc.Dropdown(
+                #                 id='city_dropdown_recovered',
+                #                 options=[{'label': i, 'value': i} for i in dropdown_cities_recovered],
+                #                 value='Ontario',
+                #                 className="dcc_controls",
+                #                 placeholder='All Departments'
+                #             ),
+                #                 dcc.Loading(html.P(id='recovered_city_text',
+                #                                    style={'color': 'white', 'fontSize': '2vh', 'padding-top': '15px'}
+                #                                    ))],
+                #             id="gadss",
+                #             className="mini_container",
+                #             style={'backgroundColor': '#6cc644'}
+                #         ),
+                #         html.Div(
+                #             [dcc.Dropdown(
+                #                 id='city_dropdown_mortality',
+                #                 options=[{'label': i, 'value': i} for i in dropdown_cities_mortality],
+                #                 value='Ottawa',
+                #                 className="dcc_controls",
+                #                 placeholder='All Departments'
+                #             ),
+                #                 dcc.Loading(html.P(id='mortality_city_text',
+                #                                    style={'color': 'white', 'fontSize': '2vh', 'padding-top': '15px'}
+                #                                    ))],
+                #             id="welldsds",
+                #             className="mini_container",
+                #             style={'backgroundColor': 'rgb(255,27,14)'}
+                #         ),
+                #     ],
+                #     className="pretty_container six columns",
+                # ),
+            ],
+            className="row flex-display",
+        ),
     ],
     id="mainContainer",
     style={"display": "flex", "flex-direction": "column"},
 )
+
+
+@app.callback(
+    [
+        Output("well_text", "children"),
+        Output("gasText", "children"),
+        Output("oilText", "children"),
+        Output("waterText", "children"),
+    ],
+    [Input("storage", "data")],
+)
+def update_text(data):
+    try:
+        dict_can = dict()
+        url_updates = 'https://opendata.arcgis.com/datasets/bbb2e4f589ba40d692fab712ae37b9ac_2.geojson'
+        with urllib.request.urlopen(url_updates) as url:
+            data = json.loads(url.read().decode())
+
+        for k, v in data.items():
+            v = v
+            for i in v:
+                if 'Canada' in str(i):
+                    dict_can = i
+                    break
+                else:
+                    continue
+
+        confirmed = dict_can.get('properties').get('Confirmed')
+        deaths = dict_can.get('properties').get('Deaths')
+        recovered = dict_can.get('properties').get('Recovered')
+    except:
+        confirmed = len(dfcases)
+        recovered = functions.sumdf(dfrecovered, 'date_recovered', 'cumulative_recovered')
+        deaths = len(dfmortality)
+    # else:
+    #     confirmed = 0
+    #     recovered = 0
+    #     deaths = 0
+
+    total_testing = functions.sumdf(dftesting, 'date_testing', 'cumulative_testing')
+    total_testing = functions.comma(int(total_testing))
+
+    mortality_text = '{} ({})'.format(functions.comma(deaths), functions.get_percentage(deaths, recovered))
+    recovered_text = '{} ({})'.format(functions.comma(recovered), functions.get_percentage(recovered, deaths))
+    return functions.comma(confirmed), recovered_text, total_testing, mortality_text
+
 
 if __name__ == '__main__':
     app.run_server()
