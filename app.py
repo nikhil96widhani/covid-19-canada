@@ -15,6 +15,7 @@ import base64
 import urllib.request
 import json
 import ssl
+
 ssl._create_default_https_context = ssl._create_unverified_context
 
 PATH = pathlib.Path(__file__).parent
@@ -37,7 +38,8 @@ dfmortality = pd.read_csv(url_mortality)
 dfrecovered = pd.read_csv(url_recovered)
 dftesting = pd.read_csv(url_testing)
 
-
+image_filename = 'testmap.png'  # replace with your own image
+encoded_image = base64.b64encode(open(image_filename, 'rb').read())
 
 # dfFips = pd.read_csv(fips)
 # dfFips = dfFips[dfFips['Country_Region'] == 'Canada'].reset_index(drop=True)
@@ -77,7 +79,7 @@ app.layout = html.Div(
                                 ),
                                 html.H5(
                                     "Last Updated today "
-                                        # .format(str(time)[:-10])
+                                    # .format(str(time)[:-10])
                                     ,
                                     style={"margin-top": "0px"}
                                 ),
@@ -103,11 +105,12 @@ app.layout = html.Div(
             className="row flex-display",
             style={"margin-bottom": "25px"},
         ),
+
         html.Div(
             [
                 html.Div(
                     [dcc.Loading(html.H6(id="well_text",
-                                         style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+                                         style={'color': 'white', 'font-weight': 'bold', 'fontSize': '3vh'}
                                          )),
                      html.P("CONFIRMED",
                             style={'color': 'white', 'fontSize': '2vh'}
@@ -118,7 +121,7 @@ app.layout = html.Div(
 
                 html.Div(
                     [dcc.Loading(html.H6(id="gasText",
-                                         style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+                                         style={'color': 'white', 'font-weight': 'bold', 'fontSize': '3vh'}
                                          )),
                      html.P("RECOVERED",
                             style={'color': 'white', 'fontSize': '2vh'}
@@ -128,7 +131,7 @@ app.layout = html.Div(
                 ),
                 html.Div(
                     [dcc.Loading(html.H6(id="waterText",
-                                         style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+                                         style={'color': 'white', 'font-weight': 'bold', 'fontSize': '3vh'}
                                          )),
                      html.P("DECEASED",
                             style={'color': 'white', 'fontSize': '2vh'}
@@ -138,7 +141,7 @@ app.layout = html.Div(
                 ),
                 html.Div(
                     [dcc.Loading(html.H6(id="oilText",
-                                         style={'color': 'white', 'font-weight': 'bold', 'fontSize': '4vh'}
+                                         style={'color': 'white', 'font-weight': 'bold', 'fontSize': '3vh'}
                                          )),
                      html.P("TESTED",
                             style={'color': 'white', 'fontSize': '2vh'}
@@ -149,6 +152,9 @@ app.layout = html.Div(
             ],
             className="row flex-display",
         ),
+        html.Marquee("Few days ago data source format was changed. Accuracy after this line is compromised. "
+                     "New update will be pushed on the weekend", dir='ltr',
+                     style={'font-weight': 'bold', 'fontSize': '2vh', "margin-bottom": "0px"}),
         # html.Div(
         #     [
         #         html.Div(
@@ -484,8 +490,58 @@ def update_text(data):
     total_testing = functions.comma(int(total_testing))
 
     mortality_text = '{} ({})'.format(functions.comma(deaths), functions.get_percentage(deaths, recovered))
-    recovered_text = '{} ({})'.format(functions.comma(recovered), functions.get_percentage(recovered, deaths))
+    recovered_text = '{} ({})'.format(functions.comma(int(recovered)), functions.get_percentage(recovered, deaths))
     return functions.comma(confirmed), recovered_text, total_testing, mortality_text
+
+
+@app.callback(
+    Output("reg_table", "data"),
+    [Input("storage", "data")],
+)
+def make_count_figure(val):
+    dff1 = dfcases[['province']]
+    dff1 = dff1.groupby(['province']).province.agg('count').to_frame('total_cases').reset_index()
+    dff1 = dff1.sort_values('total_cases', ascending=False)
+
+    dff2 = dfrecovered[['province', 'date_recovered', 'cumulative_recovered']].copy()
+    dff2['date_recovered'] = pd.to_datetime(dff2['date_recovered'])
+    dff2 = dff2.sort_values(by='date_recovered', ascending=False)
+    dff2 = dff2.drop_duplicates(subset=['province'], keep='first')
+    dff2 = dff2.rename(columns={'cumulative_recovered': 'total_recovered'})
+    dff2 = dff2[['province', 'total_recovered']]
+    # dff2 = dff2.groupby(['province']).province.agg('count').to_frame('total_recovered').reset_index()
+
+    dff3 = dfmortality[['province']]
+    dff3 = dff3.groupby(['province']).province.agg('count').to_frame('total_mortality').reset_index()
+
+    dff = pd.merge(dff1, dff2, how='left', on='province')
+    dff = pd.merge(dff, dff3, how='left', on='province')
+    dff = dff.fillna(0)
+
+    data = dff.to_dict('rows')
+
+    return data
+
+
+# Selectors -> count graph
+@app.callback(
+    Output("count_graph", "children"),
+    [Input("radio_map", "value")],
+)
+def make_count_figure(val):
+    if val == 0:
+        return dcc.Graph(figure=functions.gen_plot(dfcases), config=dict(displayModeBar=False))
+    else:
+        return html.Div([
+            html.Img(
+                src='data:image/png;base64,{}'.format(encoded_image.decode()),
+                height=470,
+                # style={
+                #     'height': '60%',
+                #     'width': '60%'
+                # }
+            )
+        ], style={'textAlign': 'center'})
 
 
 if __name__ == '__main__':
